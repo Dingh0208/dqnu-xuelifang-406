@@ -20,15 +20,37 @@
 			</view>
 		</view>
 
+		<!-- 退出登录：清除登录态并回到身份选择页 -->
+		<view class="list-card">
+			<view class="row last-row logout-row" @click="onLogout">
+				<text class="row-label logout-label">退出登录</text>
+			</view>
+		</view>
+
 		<view class="bottom-space"></view>
 	</view>
 </template>
 
 <script>
+	import * as authApi from '@/api/auth.js'
+
 	export default {
 		methods: {
 			onComingSoon(name) {
 				uni.showToast({ title: name + ' 即将开放', icon: 'none' })
+			},
+			onLogout() {
+				uni.showModal({
+					title: '退出登录',
+					content: '确定要退出当前账号吗？',
+					confirmColor: '#E8A340',
+					success: (res) => {
+						if (!res.confirm) return
+						authApi.logout()
+						// reLaunch 清空页面栈，返回键不会回到学生端页面
+						uni.reLaunch({ url: '/pages/auth/select' })
+					}
+				})
 			}
 		}
 	}
@@ -78,6 +100,10 @@
 	.row-arrow {
 		font-size: 34rpx;
 		color: #C6B092;
+	}
+
+	.logout-label {
+		color: #C0563C;
 	}
 
 	.bottom-space {

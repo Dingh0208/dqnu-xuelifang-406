@@ -1,9 +1,33 @@
 {
 	"pages": [
 		{
+			"path": "pages/auth/select",
+			"style": {
+				"navigationBarTitleText": "学立方"
+			}
+		},
+		{
+			"path": "pages/auth/login",
+			"style": {
+				"navigationBarTitleText": "登录 / 注册"
+			}
+		},
+		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "学生端首页"
+			}
+		},
+		{
+			"path": "pages/teacher/home",
+			"style": {
+				"navigationBarTitleText": "老师主页"
+			}
+		},
+		{
+			"path": "pages/parent/home",
+			"style": {
+				"navigationBarTitleText": "家长主页"
 			}
 		},
 		{
