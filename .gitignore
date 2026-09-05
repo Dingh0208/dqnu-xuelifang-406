@@ -141,3 +141,18 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+unpackage/
+.DS_Store
+.hbuilderx/
+
+# 依赖与本地环境（防止误上传）
+node_modules/
+.env
+.env.local
+.env.*.local
+
+# 日志与系统/IDE 临时文件
+*.log
+.idea/
+.vscode/
+Thumbs.db

@@ -1,0 +1,131 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "学生端首页"
+			}
+		},
+		{
+			"path": "pages/wrongbook/index",
+			"style": {
+				"navigationBarTitleText": "错题本"
+			}
+		},
+		{
+			"path": "pages/wrongbook/detail",
+			"style": {
+				"navigationBarTitleText": "错题详情"
+			}
+		},
+		{
+			"path": "pages/wrongbook/history",
+			"style": {
+				"navigationBarTitleText": "历史记录"
+			}
+		},
+		{
+			"path": "pages/workbench/index",
+			"style": {
+				"navigationBarTitleText": "工作台"
+			}
+		},
+		{
+			"path": "pages/workbench/inspiration-detail",
+			"style": {
+				"navigationBarTitleText": "工作台灵感"
+			}
+		},
+		{
+			"path": "pages/workbench/create-mode",
+			"style": {
+				"navigationBarTitleText": "创建工作台"
+			}
+		},
+		{
+			"path": "pages/workbench/questionnaire",
+			"style": {
+				"navigationBarTitleText": "工作台创建"
+			}
+		},
+		{
+			"path": "pages/profile/index",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/schedule/index",
+			"style": {
+				"navigationBarTitleText": "学习安排"
+			}
+		},
+		{
+			"path": "pages/tasks/index",
+			"style": {
+				"navigationBarTitleText": "今日计划"
+			}
+		},
+		{
+			"path": "pages/review/index",
+			"style": {
+				"navigationBarTitleText": "复习安排"
+			}
+		},
+		{
+			"path": "pages/shop/index",
+			"style": {
+				"navigationBarTitleText": "银币商城"
+			}
+		},
+		{
+			"path": "pages/profile/coin-detail",
+			"style": {
+				"navigationBarTitleText": "学习金币"
+			}
+		},
+		{
+			"path": "pages/profile/membership",
+			"style": {
+				"navigationBarTitleText": "终身会员"
+			}
+		},
+		{
+			"path": "pages/profile/faq",
+			"style": {
+				"navigationBarTitleText": "常见问题"
+			}
+		},
+		{
+			"path": "pages/profile/feedback",
+			"style": {
+				"navigationBarTitleText": "向开发者提建议"
+			}
+		},
+		{
+			"path": "pages/profile/settings",
+			"style": {
+				"navigationBarTitleText": "设置"
+			}
+		},
+		{
+			"path": "pages/profile/theme",
+			"style": {
+				"navigationBarTitleText": "主题"
+			}
+		},
+		{
+			"path": "pages/profile/about",
+			"style": {
+				"navigationBarTitleText": "关于学立方"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"uniIdRouter": {}
+}
