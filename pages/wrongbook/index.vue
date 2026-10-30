@@ -4,31 +4,20 @@
 		<view class="fixed-top">
 			<!-- 顶部标题 + 历史记录入口 -->
 			<view class="page-header">
-				<text class="page-title">错题本</text>
+				<text class="page-title">错题银行</text>
 				<text class="history-link" @click="goHistory">历史记录</text>
 			</view>
 
-			<!-- 错题统计卡片 -->
-			<view class="stats-card">
-				<view class="stats-head">
-					<text class="stats-title">我的错题</text>
-					<text class="stats-total">共 {{ statistics.total }} 道错题</text>
-				</view>
-				<view class="stats-row">
-					<view class="stats-item">
-						<text class="stats-num review">{{ statistics.reviewCount }}</text>
-						<text class="stats-label">待复习</text>
-					</view>
-					<view class="stats-divider"></view>
-					<view class="stats-item">
-						<text class="stats-num mastered">{{ statistics.masteredCount }}</text>
-						<text class="stats-label">已掌握</text>
-					</view>
-				</view>
-			</view>
+			<text class="stats-line">错题 {{ statistics.total }} · 已掌握 {{ statistics.masteredCount }} · 待复习 {{ statistics.reviewCount }}</text>
 
 			<!-- 顶部上传区域（拍照 / 文档，并列占满一行） -->
-			<wrong-book-upload @camera="handleCameraUpload" @document="handleDocumentImport" />
+			<view class="entry-card">
+				<view class="entry-head">
+					<text class="entry-title">＋　录入一道错题</text>
+					<text class="entry-hint">{{ uploading ? '上传中…' : '录入后整理复习' }}</text>
+				</view>
+				<wrong-book-upload @camera="handleCameraUpload" @document="handleDocumentImport" @paste="handlePasteInput" />
+			</view>
 
 			<!-- 分类筛选 -->
 			<view class="filter-row">
@@ -39,7 +28,7 @@
 					:class="{ active: activeFilter === f.key }"
 					@click="switchFilter(f.key)"
 				>
-					<text class="filter-text">{{ f.label }}</text>
+					<text class="filter-text">{{ f.label }} <text class="filter-count">{{ filterCount(f.key) }}</text></text>
 				</view>
 			</view>
 		</view>
@@ -54,13 +43,31 @@
 			@scroll="onListScroll"
 		>
 			<view class="list-content">
-				<wrong-question-stack :list="filteredList" @click="handleWrongBookItemClick" />
+				<view v-if="pageStatus === 'loading'" class="aq-state-card">
+					<text class="aq-state-text">正在加载错题…</text>
+				</view>
+				<view v-else-if="pageStatus === 'error'" class="aq-state-card">
+					<text class="aq-state-text">错题加载失败，请稍后重试</text>
+					<view class="aq-btn aq-btn-ghost state-btn" @click="loadData"><text>重新加载</text></view>
+				</view>
+				<view v-else-if="filteredList.length === 0" class="aq-state-card">
+					<text class="aq-state-text">这里还没有错题，先录入一道吧</text>
+				</view>
+				<wrong-question-stack v-else :list="filteredList" @click="handleWrongBookItemClick" />
 			</view>
 		</scroll-view>
 
 		<!-- 固定底部 TabBar 独立层：不在 scroll-view 内，不参与滚动，始终固定在视口底部 -->
 		<view class="tabbar-holder">
 			<bottom-tab-bar current="wrongbook" />
+		</view>
+		<view v-if="pasteVisible" class="paste-mask" @click.self="pasteVisible = false">
+			<view class="paste-dialog">
+				<text class="paste-title">粘贴文字</text>
+				<textarea v-model="pastedText" class="paste-input" placeholder="剪贴板内容会显示在这里" />
+				<text class="paste-note">文字识别接口尚未接入，此内容暂时不会加入错题列表。</text>
+				<view class="paste-actions"><text @click="pasteVisible = false">关闭</text><text class="paste-confirm" @click="confirmPaste">读取剪贴板</text></view>
+			</view>
 		</view>
 	</view>
 </template>
@@ -84,10 +91,15 @@
 		},
 		data() {
 			return {
+				pageStatus: 'loading', // loading / normal / error
 				activeFilter: 'all',
+				uploading: false,
+				pasteVisible: false,
+				pastedText: '',
 				filters: [
 					{ key: 'all', label: '全部' },
 					{ key: 'review', label: '待复习' },
+					{ key: 'week', label: '本周新增' },
 					{ key: 'mastered', label: '已掌握' }
 				],
 				list: [],
@@ -108,6 +120,7 @@
 			filteredList() {
 				var status = this.activeFilter
 				return this.list.filter(function (item) {
+					if (status === 'week') return isAddedThisWeek(item)
 					if (status !== 'all' && item.status !== status) return false
 					return true
 				})
@@ -122,6 +135,12 @@
 				if (this.activeFilter === key) return
 				this.activeFilter = key
 				this.resetListScroll()
+			},
+			filterCount(key) {
+				if (key === 'all') return this.statistics.total
+				if (key === 'review') return this.statistics.reviewCount
+				if (key === 'mastered') return this.statistics.masteredCount
+				return this.list.filter(isAddedThisWeek).length
 			},
 			// 记录 list-scroll 实际滚动位置，用于切换筛选时重置
 			onListScroll(e) {
@@ -138,31 +157,106 @@
 			},
 			// 数据层：当前走 Mock（USE_MOCK=true），未来同一切换为真实 API，模板无需改动
 			loadData() {
-				getWrongBookList().then((res) => {
-					this.list = res.data.list
-				})
-				getWrongBookStatistics().then((res) => {
-					this.statistics = res.data
-				})
+				this.pageStatus = 'loading'
+				Promise.all([getWrongBookList(), getWrongBookStatistics()])
+					.then((res) => {
+						this.list = res[0].data.list || []
+						this.statistics = res[1].data || this.statistics
+						this.pageStatus = 'normal'
+					})
+					.catch(() => {
+						this.pageStatus = 'error'
+					})
 			},
-			// 拍照上传：未来 wx.chooseMedia → uploadImage(filePath)
+			// 拍照上传：先选图取临时路径，再上传；uploading 锁防止重复提交
 			handleCameraUpload() {
-				// 预留真实能力（当前 Mock 阶段直接走 api 层模拟）
-				// uni.chooseMedia({ count: 1, mediaType: ['image'], sourceType: ['camera', 'album'] })
-				//   .then(res => uploadImage(res.tempFiles[0].tempFilePath))
-				uploadImage('').then(() => {
-					uni.showToast({ title: '已提交识别', icon: 'none' })
-					this.loadData()
+				if (this.uploading) return
+				var self = this
+				var onPicked = function (filePath) {
+					if (!filePath) {
+						uni.showToast({ title: '未获取到图片', icon: 'none' })
+						return
+					}
+					self.uploadFile(filePath, 'image')
+				}
+				if (typeof uni.chooseMedia === 'function') {
+					uni.chooseMedia({
+						count: 1,
+						mediaType: ['image'],
+						sourceType: ['camera', 'album'],
+						success: function (res) {
+							var file = res && res.tempFiles && res.tempFiles[0]
+							onPicked(file && file.tempFilePath)
+						}
+					})
+					return
+				}
+				if (typeof uni.chooseImage === 'function') {
+					uni.chooseImage({
+						count: 1,
+						sourceType: ['camera', 'album'],
+						success: function (res) {
+							onPicked(res && res.tempFilePaths && res.tempFilePaths[0])
+						}
+					})
+					return
+				}
+				uni.showToast({ title: '当前平台暂不支持拍照上传', icon: 'none' })
+			},
+			// 文档导入：先选择文件取临时路径，再上传
+			handleDocumentImport() {
+				if (this.uploading) return
+				var self = this
+				if (typeof uni.chooseMessageFile !== 'function') {
+					uni.showToast({ title: '当前平台暂不支持文档导入', icon: 'none' })
+					return
+				}
+				uni.chooseMessageFile({
+					count: 1,
+					type: 'file',
+					success: function (res) {
+						var file = res && res.tempFiles && res.tempFiles[0]
+						var filePath = file && (file.path || file.tempFilePath)
+						if (!filePath) {
+							uni.showToast({ title: '未获取到文件', icon: 'none' })
+							return
+						}
+						self.uploadFile(filePath, 'document')
+					}
 				})
 			},
-			// 文档导入：未来 wx.chooseMessageFile → uploadDocument(filePath)
-			handleDocumentImport() {
-				// uni.chooseMessageFile({ count: 1, type: 'file' })
-				//   .then(res => uploadDocument(res.tempFiles[0].path))
-				uploadDocument('').then(() => {
-					uni.showToast({ title: '已提交识别', icon: 'none' })
-					this.loadData()
-				})
+			// 统一上传：持锁 → 调 API → 成功后刷新列表，失败提示并解锁
+			uploadFile(filePath, kind) {
+				var self = this
+				if (this.uploading) return
+				this.uploading = true
+				var request = kind === 'image' ? uploadImage(filePath) : uploadDocument(filePath)
+				request
+					.then(function () {
+						uni.showToast({ title: '已提交识别', icon: 'none' })
+						self.loadData()
+					})
+					.catch(function () {
+						uni.showToast({ title: '上传失败，请稍后重试', icon: 'none' })
+					})
+					.then(function () {
+						self.uploading = false
+					}, function () {
+						self.uploading = false
+					})
+			},
+			handlePasteInput() {
+				this.pastedText = ''
+				this.pasteVisible = true
+				if (typeof uni.getClipboardData !== 'function') return
+				uni.getClipboardData({ success: (res) => { this.pastedText = (res && res.data) || '' } })
+			},
+			confirmPaste() {
+				if (!this.pastedText.trim()) {
+					uni.showToast({ title: '剪贴板没有文字', icon: 'none' })
+					return
+				}
+				uni.showToast({ title: '文字识别接口尚未接入', icon: 'none' })
 			},
 			// 点击错题卡片 → 进入详情
 			handleWrongBookItemClick(item) {
@@ -173,6 +267,20 @@
 			}
 		}
 	}
+
+	function isAddedThisWeek(item) {
+		var raw = String(item.createdAt || item.uploadedAt || '').slice(0, 10)
+		var parts = raw.split('-')
+		if (parts.length !== 3) return false
+		var added = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]))
+		if (isNaN(added.getTime())) return false
+		var today = new Date()
+		today.setHours(0, 0, 0, 0)
+		var start = new Date(today)
+		var day = (start.getDay() + 6) % 7
+		start.setDate(start.getDate() - day)
+		return added >= start && added <= today
+	}
 </script>
 
 <style>
@@ -182,19 +290,18 @@
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		background-color: #F7EFE3;
+		background: transparent;
 		box-sizing: border-box;
 	}
 
 	/* 固定顶部：标题 / 上传 / 历史 / 我的错题 / 筛选，高度自然撑开，不参与滚动 */
 	.fixed-top {
 		flex-shrink: 0;
-		padding: 10rpx 24rpx 0;
+		padding: 0 var(--app-page-padding);
 		box-sizing: border-box;
 	}
 
-	/* 唯一滚动区域：flex:1 + min-height:0 占据顶部与 TabBar 之间的全部剩余空间，
-	   只有错题卡片列表在此滚动；页面整体与顶部内容均不滚动 */
+	/* 唯一滚动区域：flex:1 + min-height:0 占据顶部与 TabBar 之间的全部剩余空间 */
 	.list-scroll {
 		flex: 1;
 		min-height: 0;
@@ -203,7 +310,7 @@
 	}
 
 	.list-content {
-		padding: 0 24rpx;
+		padding: 0 var(--app-page-padding);
 		box-sizing: border-box;
 	}
 
@@ -212,117 +319,183 @@
 		flex-shrink: 0;
 		position: relative;
 		z-index: 20;
-		height: 100rpx;
-		height: calc(100rpx + env(safe-area-inset-bottom));
+		height: calc(124rpx + env(safe-area-inset-bottom));
 	}
 
 	.page-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 28rpx 8rpx 26rpx;
+		padding: 22rpx 0 12rpx;
 	}
 
 	.page-title {
-		font-size: 40rpx;
+		font-size: 38rpx;
 		font-weight: 600;
-		color: #4A3520;
+		color: var(--app-ink);
 	}
 
 	.history-link {
-		font-size: 26rpx;
-		color: #B56A3C;
-	}
-
-	/* 错题统计卡片 */
-	.stats-card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 32rpx 30rpx;
-		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
-	}
-
-	.stats-head {
-		display: flex;
-		justify-content: space-between;
+		display: inline-flex;
 		align-items: center;
-		margin-bottom: 28rpx;
+		padding: 8rpx 18rpx;
+		border-radius: 999rpx;
+		background: rgba(18, 181, 165, 0.10);
+		color: #0A6B63;
+		font-size: 23rpx;
+		font-weight: 500;
 	}
 
-	.stats-title {
-		font-size: 32rpx;
-		font-weight: 600;
-		color: #4A3520;
-	}
-
-	.stats-total {
-		font-size: 26rpx;
-		color: #8D7964;
-	}
-
-	.stats-row {
-		display: flex;
-		align-items: center;
-	}
-
-	.stats-item {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	.stats-num {
-		font-size: 44rpx;
-		font-weight: 700;
-		line-height: 1.2;
-	}
-
-	.stats-num.review {
-		color: #B56A3C;
-	}
-
-	.stats-num.mastered {
-		color: #8D7964;
-	}
-
-	.stats-label {
+	.stats-line {
+		display: block;
 		font-size: 24rpx;
-		color: #8D7964;
-		margin-top: 8rpx;
+		color: var(--app-muted);
+		padding: 0 0 20rpx;
 	}
 
-	.stats-divider {
-		width: 1rpx;
-		height: 60rpx;
-		background-color: #EFE3D0;
+	.entry-card {
+		position: relative;
+		overflow: hidden;
+		padding: 28rpx;
+		margin-bottom: 24rpx;
+		border-radius: 36rpx;
+		background: linear-gradient(135deg, #0B4F5B 0%, #0E7480 48%, #17AAA1 100%);
+		box-shadow: 0 16rpx 36rpx rgba(10, 80, 90, 0.18);
+	}
+
+	.entry-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 22rpx;
+	}
+
+	.entry-title {
+		font-size: 28rpx;
+		font-weight: 600;
+		color: #FFFFFF;
+	}
+
+	.entry-hint {
+		font-size: 22rpx;
+		color: rgba(255, 255, 255, 0.62);
 	}
 
 	/* 分类筛选 */
 	.filter-row {
 		display: flex;
-		margin-bottom: 24rpx;
+		margin-bottom: 22rpx;
 	}
 
 	.filter-pill {
-		padding: 12rpx 36rpx;
+		flex: 1;
+		min-width: 0;
+		padding: 13rpx 6rpx;
 		border-radius: 999rpx;
-		background-color: #F3E9DA;
-		margin-right: 20rpx;
+		background-color: rgba(255, 255, 255, 0.92);
+		border: 1rpx solid var(--app-line);
+		margin-right: 10rpx;
+		text-align: center;
+	}
+
+	.filter-pill:last-child {
+		margin-right: 0;
 	}
 
 	.filter-pill.active {
-		background-color: #B56A3C;
+		background: rgba(18, 181, 165, 0.10);
+		border-color: rgba(18, 181, 165, 0.35);
 	}
 
 	.filter-text {
-		font-size: 26rpx;
-		color: #8D7964;
+		font-size: 23rpx;
+		color: var(--app-copy);
+	}
+
+	.filter-count {
+		color: var(--app-muted);
+		font-size: 21rpx;
 	}
 
 	.filter-pill.active .filter-text {
-		color: #FFFDF8;
+		color: #0A6B63;
+		font-weight: 600;
+	}
+
+	.filter-pill.active .filter-count {
+		color: #0A6B63;
+	}
+
+	.state-btn {
+		width: 240rpx;
+		height: 72rpx;
+		margin: 24rpx auto 0;
+		font-size: 26rpx;
+	}
+
+	.paste-mask {
+		position: fixed;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 80;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 36rpx;
+		background: var(--student-mask);
+	}
+
+	.paste-dialog {
+		width: 100%;
+		padding: 30rpx;
+		border-radius: var(--app-radius);
+		background: var(--app-surface-solid);
+		border: 1rpx solid var(--app-line);
+		box-shadow: var(--app-shadow);
+		box-sizing: border-box;
+	}
+
+	.paste-title {
+		font-size: 31rpx;
+		font-weight: 600;
+		color: var(--app-ink);
+	}
+
+	.paste-input {
+		width: 100%;
+		min-height: 190rpx;
+		margin-top: 18rpx;
+		padding: 18rpx;
+		border: 1rpx solid var(--app-line);
+		border-radius: 20rpx;
+		background: #FFFFFF;
+		box-sizing: border-box;
+		font-size: 25rpx;
+		color: var(--app-copy);
+	}
+
+	.paste-note {
+		display: block;
+		margin-top: 14rpx;
+		font-size: 21rpx;
+		line-height: 1.5;
+		color: var(--app-muted);
+	}
+
+	.paste-actions {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		margin-top: 24rpx;
+		color: var(--app-muted);
+		font-size: 25rpx;
+	}
+
+	.paste-confirm {
+		margin-left: 30rpx;
+		color: var(--app-primary);
 		font-weight: 600;
 	}
 </style>

@@ -30,8 +30,8 @@
 	.menu-item {
 		display: flex;
 		align-items: center;
-		padding: 28rpx 0;
-		border-bottom: 1rpx solid #EFE3D0;
+		padding: 25rpx 0;
+		border-bottom: 1rpx solid var(--student-line);
 	}
 
 	.menu-item.last-row {
@@ -39,25 +39,31 @@
 	}
 
 	.icon {
-		font-size: 34rpx;
-		line-height: 1;
+		width: 58rpx;
+		height: 58rpx;
+		border-radius: 17rpx;
+		background: var(--student-surface-soft);
+		font-size: 29rpx;
+		line-height: 58rpx;
+		text-align: center;
+		color: var(--student-ink);
 	}
 
 	.label {
 		flex: 1;
 		margin-left: 18rpx;
 		font-size: 29rpx;
-		color: #4A3520;
+		color: var(--student-ink);
 	}
 
 	.value {
 		font-size: 25rpx;
-		color: #B49D82;
+		color: var(--student-muted);
 		margin-right: 12rpx;
 	}
 
 	.arrow {
 		font-size: 34rpx;
-		color: #C6B092;
+		color: var(--student-hint);
 	}
 </style>

@@ -12,16 +12,13 @@
 				<view class="skeleton-block sk-item"></view>
 			</view>
 		</view>
-		<!-- empty -->
 		<view v-else-if="pageStatus === 'empty'" class="empty-state">
 			<text class="empty-text">暂无常见问题</text>
 		</view>
-		<!-- error：支持重新加载 -->
 		<view v-else-if="pageStatus === 'error'" class="empty-state">
 			<text class="empty-text">加载失败</text>
 			<view class="retry-btn" @click="loadFaq"><text class="retry-text">重新加载</text></view>
 		</view>
-		<!-- normal -->
 		<view v-else class="list">
 			<view v-for="(cat, idx) in categories" :key="idx" class="cat-card">
 				<text class="cat-title">{{ cat.category }}</text>
@@ -78,17 +75,17 @@
 <style>
 	.page {
 		min-height: 100vh;
-		background-color: #F7EFE3;
-		padding: 10rpx 24rpx 0;
+		padding: 0 var(--app-page-padding);
 		box-sizing: border-box;
+		background: transparent;
 	}
 
 	.page-title {
 		display: block;
-		font-size: 40rpx;
+		font-size: 38rpx;
 		font-weight: 600;
-		color: #4A3520;
-		padding: 28rpx 8rpx 26rpx;
+		color: var(--app-ink);
+		padding: 22rpx 0 22rpx;
 	}
 
 	.list {
@@ -97,24 +94,25 @@
 	}
 
 	.cat-card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 28rpx 30rpx;
-		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		background-color: var(--app-surface-solid);
+		border: 1rpx solid var(--app-line);
+		border-radius: var(--app-radius);
+		padding: 26rpx 28rpx;
+		margin-bottom: 22rpx;
+		box-shadow: var(--app-shadow-soft);
 	}
 
 	.cat-title {
 		display: block;
-		font-size: 28rpx;
+		font-size: 30rpx;
 		font-weight: 600;
-		color: #4A3520;
-		margin-bottom: 12rpx;
+		color: var(--app-ink);
+		margin-bottom: 10rpx;
 	}
 
 	.qa-item {
 		padding: 20rpx 0;
-		border-top: 1rpx solid #EFE3D0;
+		border-top: 1rpx solid var(--app-line);
 	}
 
 	.qa-q {
@@ -126,12 +124,12 @@
 	.q-text {
 		flex: 1;
 		font-size: 27rpx;
-		color: #4A3520;
+		color: var(--app-ink);
 	}
 
 	.q-arrow {
 		font-size: 32rpx;
-		color: #C6B092;
+		color: var(--app-hint);
 		transition: transform 0.2s;
 	}
 
@@ -143,20 +141,21 @@
 		display: block;
 		margin-top: 14rpx;
 		font-size: 25rpx;
-		color: #8D7964;
+		color: var(--app-muted);
 		line-height: 1.6;
 	}
 
 	.cat-skeleton {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 28rpx 30rpx;
-		margin-bottom: 24rpx;
+		background-color: var(--app-surface-solid);
+		border: 1rpx solid var(--app-line);
+		border-radius: var(--app-radius);
+		padding: 28rpx;
+		margin-bottom: 22rpx;
 	}
 
 	.skeleton-block {
 		border-radius: 8rpx;
-		background-color: #EFE3D0;
+		background: var(--app-surface-soft);
 	}
 
 	.sk-title {
@@ -172,7 +171,7 @@
 	}
 
 	.empty-state {
-		padding: 80rpx 0;
+		padding: 72rpx 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -180,19 +179,20 @@
 
 	.empty-text {
 		font-size: 27rpx;
-		color: #8D7964;
+		color: var(--app-muted);
 	}
 
 	.retry-btn {
 		margin-top: 24rpx;
-		padding: 14rpx 40rpx;
-		border: 1rpx solid #E0B489;
+		padding: 16rpx 44rpx;
+		border: 1rpx solid var(--app-line);
 		border-radius: 999rpx;
+		background: var(--app-surface-solid);
 	}
 
 	.retry-text {
 		font-size: 26rpx;
-		color: #B56A3C;
+		color: var(--app-primary);
 	}
 
 	.bottom-space {

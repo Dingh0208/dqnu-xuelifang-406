@@ -18,7 +18,7 @@
 // ============================================================
 
 import { USE_MOCK } from '@/utils/config.js'
-import { request } from './request.js'
+import { request, uploadFile } from './request.js'
 import * as mock from '@/mock/wrongbook.js'
 
 // 1. 错题列表
@@ -51,27 +51,16 @@ export function updateWrongBook(id, patch) {
 	return request({ url: '/api/student/wrongbook/' + id, method: 'PATCH', data: patch })
 }
 
-// 6. 拍照上传（未来调用 wx.chooseMedia 后，把临时 filePath 通过 uploadFile 发到后端）
+// 6. 拍照上传（调用 chooseMedia 取得临时路径后，通过 uni.uploadFile 上传）
 export function uploadImage(filePath) {
 	if (USE_MOCK) return Promise.resolve(mock.uploadImageMock(filePath))
-	// 真实环境示例（不在当前阶段执行）：
-	// return new Promise((resolve, reject) => {
-	//   uni.uploadFile({
-	//     url: BASE_URL + '/api/student/wrongbook/upload/image',
-	//     filePath: filePath,
-	//     name: 'file',
-	//     header: { Authorization: 'Bearer ' + token },
-	//     success: res => resolve(JSON.parse(res.data)),
-	//     fail: reject
-	//   })
-	// })
-	return request({ url: '/api/student/wrongbook/upload/image', method: 'POST', data: { filePath: filePath } })
+	return uploadFile({ url: '/api/student/wrongbook/upload/image', filePath: filePath, name: 'file' })
 }
 
-// 7. 文档导入（未来调用 wx.chooseMessageFile 后上传）
+// 7. 文档导入（调用 chooseMessageFile 取得临时路径后上传）
 export function uploadDocument(filePath) {
 	if (USE_MOCK) return Promise.resolve(mock.uploadDocumentMock(filePath))
-	return request({ url: '/api/student/wrongbook/upload/document', method: 'POST', data: { filePath: filePath } })
+	return uploadFile({ url: '/api/student/wrongbook/upload/document', filePath: filePath, name: 'file' })
 }
 
 // 8. 上传历史列表

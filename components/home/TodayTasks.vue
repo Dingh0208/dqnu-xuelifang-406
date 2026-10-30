@@ -1,8 +1,8 @@
-﻿<template>
+<template>
 	<view class="card">
 		<view class="card-header">
-			<text class="card-title">今日计划</text>
-			<text v-if="showMore" class="card-more" @click="onMore">查看全部 ›</text>
+			<text class="card-title">今日待办任务</text>
+			<text v-if="showMore" class="card-more" @click="onMore">{{ displayTasks.length }} 项</text>
 		</view>
 
 		<view class="task-list">
@@ -14,29 +14,42 @@
 			>
 				<view class="checkbox-hit" @click="onToggle(task)">
 					<view class="task-checkbox" :class="{ checked: task.completed }">
-						<!-- ✓ 节点用 v-show 常驻（display 切换，mp 端属性级更新稳定）；
-						     勿改回 v-if：v-if 节点增删在「v-for 内对象属性变化」场景下 diff 易丢更新，
-						     曾导致 completed=true 时出现「黄底无✓」中间态 -->
+						<!-- ✓ 节点常驻 + v-show 切换（mp 端属性级更新稳定），勿改回 v-if -->
 						<text v-show="task.completed" class="check-mark">✓</text>
 					</view>
 				</view>
-				<view class="task-info">
+				<view class="task-info" @click="toggleExpand(task)">
 					<text class="task-title" :class="{ 'task-done': task.completed }">{{ task.title }}</text>
 					<text class="task-desc">{{ task.description }}</text>
+					<view v-if="expandedId === task.id" class="task-actions">
+						<text class="task-estimate">预计 {{ task.estimatedMinutes || 25 }} 分钟</text>
+						<view class="task-start-btn" @click.stop="onStart(task)">
+							<text>开始专注</text>
+						</view>
+					</view>
 				</view>
-				<text class="task-duration">{{ task.estimatedMinutes }}分钟</text>
+				<!-- 班级任务小标签（仅 source === 'class' 显示，AI 任务无标签） -->
+				<class-task-badge :source="task.source" />
+				<text class="task-status" :class="{ done: task.completed }">{{ task.completed ? '已完成' : '待完成' }}</text>
 			</view>
-			<!-- 全部完成时卡片兜底提示（首页传未完成任务列表，完成后自然为空） -->
 			<view v-if="displayTasks.length === 0" class="task-empty">
-				<text class="task-empty-text">今日任务已全部完成</text>
+				<text class="task-empty-text">{{ emptyText }}</text>
+				<view v-if="emptyActionText" class="task-empty-action" @click="onEmptyAction">
+					<text>{{ emptyActionText }}</text>
+				</view>
 			</view>
 		</view>
 	</view>
 </template>
 
 <script>
+	import ClassTaskBadge from '@/components/common/ClassTaskBadge.vue'
+
 	export default {
 		name: 'TodayTasks',
+		components: {
+			ClassTaskBadge
+		},
 		props: {
 			tasks: {
 				type: Array,
@@ -47,12 +60,23 @@
 			showMore: {
 				type: Boolean,
 				default: true
+			},
+			emptyText: {
+				type: String,
+				default: '今日任务已全部完成'
+			},
+			emptyActionText: {
+				type: String,
+				default: ''
+			}
+		},
+		data() {
+			return {
+				expandedId: ''   // 当前展开的任务 id；只做展开展示，不影响任务状态
 			}
 		},
 		computed: {
-			// 【2026-09 重写】纯展示组件：直接渲染传入的 tasks。
-			// 首页传入「未完成任务新数组」（taskState.getPendingTasks()，顺序由状态源维护）；
-			// 本组件不做任何分组/排序/过滤；checkbox 唯一数据源 = task.completed。
+			// 纯展示组件：直接渲染传入的 tasks（首页传入 getPendingTasks()）
 			displayTasks() {
 				return this.tasks
 			}
@@ -64,6 +88,15 @@
 			},
 			onMore() {
 				this.$emit('more')
+			},
+			toggleExpand(task) {
+				this.expandedId = this.expandedId === task.id ? '' : task.id
+			},
+			onStart(task) {
+				this.$emit('start', task)
+			},
+			onEmptyAction() {
+				this.$emit('empty-action')
 			}
 		}
 	}
@@ -71,11 +104,16 @@
 
 <style>
 	.card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 32rpx 30rpx;
+		/* 让仍引用旧 token 的 ClassTaskBadge 在组件内也拿到 Aqua 色值 */
+		--student-line: #D3E8E7;
+		--student-surface-soft: #E2F3F2;
+		--student-muted: #7B9AA1;
+		padding: 28rpx;
 		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		background: var(--app-surface, rgba(255, 255, 255, 0.90));
+		border: 1rpx solid var(--app-line, #D3E8E7);
+		border-radius: 28rpx;
+		box-shadow: var(--app-shadow-soft, 0 4rpx 14rpx rgba(10, 80, 90, 0.06));
 	}
 
 	.card-header {
@@ -88,97 +126,158 @@
 	.card-title {
 		font-size: 32rpx;
 		font-weight: 600;
-		color: #4A3520;
+		color: var(--app-ink, #0D2F36);
 	}
 
 	.card-more {
-		font-size: 26rpx;
-		color: #8D7964;
+		font-size: 24rpx;
+		color: var(--app-muted, #7B9AA1);
 	}
 
 	.task-row {
 		display: flex;
 		align-items: flex-start;
-		padding: 26rpx 0;
-		border-bottom: 1rpx solid #EFE3D0;
+		padding: 22rpx 0;
+		border-bottom: 1rpx solid var(--app-line, #D3E8E7);
 	}
 
 	.task-row.last-row {
 		border-bottom: none;
-		padding-bottom: 8rpx;
+		padding-bottom: 4rpx;
 	}
 
-	/* 自定义 Checkbox：加一层点击热区 */
 	.checkbox-hit {
-		padding: 6rpx 16rpx 6rpx 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 88rpx;
+		height: 88rpx;
+		margin: -18rpx 0 -18rpx -18rpx;
 		flex-shrink: 0;
 	}
 
 	.task-checkbox {
 		width: 44rpx;
 		height: 44rpx;
-		border-radius: 12rpx;
 		box-sizing: border-box;
-		background-color: #FFF9EE;
-		border: 2rpx solid #E0C9A6;
+		border-radius: 14rpx;
+		background: var(--app-surface-solid, #FFFFFF);
+		border: 2rpx solid var(--app-line, #D3E8E7);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
 	.task-checkbox.checked {
-		background-color: #E8A340;
-		border-color: #E8A340;
+		background: var(--app-positive, #0E9F86);
+		border-color: var(--app-positive, #0E9F86);
 	}
 
 	.check-mark {
 		font-size: 26rpx;
 		font-weight: 700;
-		color: #FFFFFF;
 		line-height: 1;
+		color: #FFFFFF;
 	}
 
 	.task-info {
 		flex: 1;
 		min-width: 0;
+		padding-top: 2rpx;
 	}
 
 	.task-title {
 		display: block;
-		font-size: 30rpx;
-		color: #4A3520;
+		font-size: 29rpx;
 		font-weight: 500;
-		line-height: 44rpx;
+		line-height: 42rpx;
+		color: var(--app-ink, #0D2F36);
 	}
 
-	/* 完成任务：仅降低文字强调度，与参考图一致，不加删除线 */
 	.task-title.task-done {
-		color: #9C8874;
+		color: var(--app-muted, #7B9AA1);
+		text-decoration: line-through;
 	}
 
 	.task-desc {
 		display: block;
-		font-size: 24rpx;
-		color: #8D7964;
-		margin-top: 8rpx;
+		margin-top: 6rpx;
+		font-size: 23rpx;
+		line-height: 1.5;
+		color: var(--app-muted, #7B9AA1);
 	}
 
-	.task-duration {
+	.task-status {
 		flex-shrink: 0;
-		margin-left: 16rpx;
-		padding-top: 8rpx;
-		font-size: 26rpx;
-		color: #8D7964;
+		margin-left: 14rpx;
+		padding: 8rpx 16rpx;
+		border-radius: 999rpx;
+		font-size: 21rpx;
+		font-weight: 600;
+		color: var(--app-warning, #C48A2A);
+		background: var(--app-warning-bg, #FFF5E2);
 	}
 
-	/* 全部完成兜底提示（沿用现有配色） */
+	.task-status.done {
+		color: var(--app-positive, #0E9F86);
+		background: var(--app-positive-bg, #E2F7F1);
+	}
+
+	.task-actions {
+		margin-top: 14rpx;
+		display: flex;
+		align-items: center;
+	}
+
+	.task-estimate {
+		font-size: 22rpx;
+		color: var(--app-muted, #7B9AA1);
+		margin-right: 16rpx;
+	}
+
+	.task-start-btn {
+		height: 56rpx;
+		padding: 0 24rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(18, 181, 165, 0.12);
+		border-radius: 999rpx;
+	}
+
+	.task-start-btn text {
+		font-size: 23rpx;
+		font-weight: 600;
+		color: #0A6B63;
+	}
+
 	.task-empty {
-		padding: 40rpx 0 24rpx;
+		padding: 44rpx 0 24rpx;
 		text-align: center;
 	}
 
 	.task-empty-text {
-		font-size: 26rpx;
-		color: #8D7964;
+		font-size: 25rpx;
+		line-height: 1.6;
+		color: var(--app-muted, #7B9AA1);
 	}
+
+	.task-empty-action {
+		margin: 22rpx auto 0;
+		height: 68rpx;
+		padding: 0 32rpx;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: linear-gradient(135deg, #0A5C6A 0%, #12B5A5 100%);
+		border-radius: 999rpx;
+		box-shadow: 0 6rpx 16rpx rgba(10, 92, 106, 0.16);
+	}
+
+	.task-empty-action text {
+		font-size: 25rpx;
+		font-weight: 600;
+		color: #FFFFFF;
+	}
+
 </style>

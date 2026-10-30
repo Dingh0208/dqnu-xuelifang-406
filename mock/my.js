@@ -9,6 +9,9 @@
 // 禁止使用 coin 同时代表金币和银币。
 // ============================================================
 
+import { completionRateByCount, todayRewardCoins } from '@/utils/reward.js'
+import { getTaskStats } from '@/utils/taskState.js'
+
 function deepCopy(o) {
 	return JSON.parse(JSON.stringify(o))
 }
@@ -74,6 +77,16 @@ var silverProducts = [
 	{ productId: 'silver_50',  silverAmount: 50,  price: 19.9, unitPrice: 0.398, enabled: true },
 	{ productId: 'silver_100', silverAmount: 100, price: 49.9, unitPrice: 0.499, enabled: true },
 	{ productId: 'silver_200', silverAmount: 200, price: 89.9, unitPrice: 0.4495, enabled: true }
+]
+
+// ---------- 金币兑换商品（学习金币的用途出口） ----------
+// 学习金币由完成任务获得，可兑换虚拟权益；让「完成→金币→兑换」形成闭环。
+// 价格/权益均为演示值，最终以后端配置为权威。
+var coinProducts = [
+	{ productId: 'coin_theme_mint', name: '薄荷主题皮肤', cost: 50,  type: 'theme',  description: '解锁专属薄荷绿首页主题' },
+	{ productId: 'coin_report_once', name: '周报导出券', cost: 20,  type: 'report', description: '导出一次家长版学习周报' },
+	{ productId: 'coin_title_1', name: '「自律新星」头衔', cost: 30,  type: 'title',  description: '个人中心展示专属头衔' },
+	{ productId: 'coin_focus_skin', name: '深海专注皮肤', cost: 80,  type: 'theme',  description: '解锁专注页深海水色皮肤' }
 ]
 
 // ---------- FAQ（未来 GET /api/student/faq） ----------
@@ -148,8 +161,17 @@ export function fetchMyPage() {
 }
 
 // GET /api/student/coins/learning（学习金币详情：余额 / 今日获得 / 今日完成度 / 今日任务情况 / 最近流水）
+// 今日完成数/总数/完成度/预计金币全部由 taskState 单一来源实时派生，
+// 不再使用静态 6/10 演示值，避免首页与金币页两套数字。
 export function fetchLearningCoinDetail() {
 	var detail = deepCopy(learningCoinDetail)
+	var stats = getTaskStats()
+	var completed = Number(stats.completed) || 0
+	var total = Number(stats.total) || 0
+	detail.todayCompletedTasks = completed
+	detail.todayTotalTasks = total
+	detail.todayCompletionRate = Math.round(completionRateByCount(completed, total))
+	detail.todayEarned = todayRewardCoins(completed, total)
 	detail.records = deepCopy(learningCoinRecords)
 	return ok(detail)
 }
@@ -162,6 +184,30 @@ export function fetchLearningCoinRecords() {
 // GET /api/student/mall/silver/products（银币商城商品；价格由数据层下发，UI 不硬编码）
 export function fetchSilverProducts() {
 	return ok({ products: deepCopy(silverProducts) })
+}
+
+// GET /api/student/mall/coin/products（金币兑换商品列表）
+export function fetchCoinProducts() {
+	return ok({ products: deepCopy(coinProducts) })
+}
+
+// POST /api/student/mall/coin/redeem（金币兑换权益；余额不足返回 400 语义的业务错误）
+export function redeemCoinProduct(productId) {
+	var target = null
+	for (var i = 0; i < coinProducts.length; i++) {
+		if (coinProducts[i].productId === productId) target = coinProducts[i]
+	}
+	if (!target) return { code: 404, message: '商品不存在', data: null }
+	if (userAssets.learningCoin < target.cost) {
+		return { code: 400, message: '金币不足，完成今日任务可以获得金币', data: null }
+	}
+	userAssets.learningCoin -= target.cost
+	return ok({
+		productId: target.productId,
+		name: target.name,
+		cost: target.cost,
+		balance: userAssets.learningCoin
+	})
 }
 
 // POST /api/student/mall/orders（创建银币充值订单；当前 Mock 不发起微信/支付宝支付）

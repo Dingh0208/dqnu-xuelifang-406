@@ -69,7 +69,7 @@
 		display: block;
 		font-size: 28rpx;
 		font-weight: 600;
-		color: #4A3520;
+		color: var(--student-ink);
 		padding: 8rpx 10rpx 14rpx;
 	}
 

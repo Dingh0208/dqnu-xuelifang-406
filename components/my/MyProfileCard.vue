@@ -39,20 +39,20 @@
 
 <style>
 	.profile-card {
-		background-color: #FFFDF8;
+		background-color: var(--student-surface);
 		border-radius: 24rpx;
 		padding: 32rpx 30rpx;
 		margin-bottom: 24rpx;
 		display: flex;
 		align-items: center;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		box-shadow: 0 4rpx 14rpx var(--student-shadow-soft);
 	}
 
 	.avatar {
 		width: 108rpx;
 		height: 108rpx;
 		border-radius: 54rpx;
-		background: linear-gradient(135deg, #EEB048 0%, #E8A340 100%);
+		background: linear-gradient(135deg, var(--student-positive) 0%, var(--student-positive) 100%);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -69,7 +69,7 @@
 	.avatar-text {
 		font-size: 44rpx;
 		font-weight: 600;
-		color: #FFFDF8;
+		color: var(--student-surface);
 	}
 
 	.info {
@@ -83,13 +83,13 @@
 	.nickname {
 		font-size: 34rpx;
 		font-weight: 600;
-		color: #4A3520;
+		color: var(--student-ink);
 	}
 
 	.signature {
 		margin-top: 10rpx;
 		font-size: 25rpx;
-		color: #8D7964;
+		color: var(--student-muted);
 	}
 
 	.settings-btn {
@@ -103,6 +103,6 @@
 
 	.settings-icon {
 		font-size: 38rpx;
-		color: #B49D82;
+		color: var(--student-hint);
 	}
 </style>

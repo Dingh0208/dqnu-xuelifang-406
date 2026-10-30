@@ -22,7 +22,17 @@
 // 回滚结构不变；storage 永不参与金币余额等资产数据（资产权威在后端）。
 // ============================================================
 
+// 设备上可能登录多个学生账号：storage key 必须带 account 维度，避免 A 的完成态被 B 继承。
+// 未登录 / 旧数据兼容时回退到无后缀 key。
 var TASK_STATE_KEY = 'student_home_task_state'
+
+function currentTaskStateKey() {
+	try {
+		var info = uni.getStorageSync('login_user_info')
+		if (info && info.account) return TASK_STATE_KEY + ':' + info.account
+	} catch (e) {}
+	return TASK_STATE_KEY
+}
 
 var state = {
 	tasks: [],            // 任务对象（唯一一份；completed 字段与两个 order 数组保持一致）
@@ -40,7 +50,7 @@ function todayStr() {
 
 function readStorage() {
 	try {
-		return uni.getStorageSync(TASK_STATE_KEY) || null
+		return uni.getStorageSync(currentTaskStateKey()) || null
 	} catch (e) {
 		return null
 	}
@@ -48,7 +58,7 @@ function readStorage() {
 
 function writeStorage(payload) {
 	try {
-		uni.setStorageSync(TASK_STATE_KEY, payload)
+		uni.setStorageSync(currentTaskStateKey(), payload)
 	} catch (e) {}
 }
 
@@ -160,6 +170,33 @@ export function initTaskState(seedTasks) {
 	return state.tasks
 }
 
+// 刷新当前学生可见任务，同时保留既有设备级今日状态存储契约。
+export function setTaskStateContext(seedTasks) {
+	state.ready = false
+	state.tasks = seedTasks || []
+	var classTaskStates = []
+	for (var i = 0; i < state.tasks.length; i++) {
+		if (state.tasks[i].source === 'class') {
+			classTaskStates.push({ id: state.tasks[i].id, completed: state.tasks[i].completed })
+		}
+	}
+	buildOrdersFromSeed()
+	restoreTodayState()
+	for (var j = 0; j < classTaskStates.length; j++) {
+		var taskState = classTaskStates[j]
+		if (taskState.completed) {
+			removeFrom(state.pendingOrder, taskState.id)
+			if (state.completionOrder.indexOf(taskState.id) === -1) state.completionOrder.push(taskState.id)
+		} else {
+			removeFrom(state.completionOrder, taskState.id)
+			if (state.pendingOrder.indexOf(taskState.id) === -1) state.pendingOrder.push(taskState.id)
+		}
+	}
+	syncCompletedFlags()
+	state.ready = true
+	return state.tasks
+}
+
 export function isTaskStateReady() {
 	return state.ready
 }
@@ -207,6 +244,17 @@ export function toggleTask(taskId) {
 	}
 	persistState()
 	return { snapshot: snapshot, completed: nowCompleted }
+}
+
+// 动态新增任务（教师端创建班级任务后同步到学生端今日任务）。
+//   幂等：id 已存在则跳过；新任务追加到未完成顺序末尾并持久化。
+//   纯增量操作，不影响现有 toggle/rollback/排序规则。
+export function addTask(task) {
+	if (!task || findTaskIndex(task.id) !== -1) return false
+	state.tasks.push(task)
+	state.pendingOrder.push(task.id)
+	persistState()
+	return true
 }
 
 // 回滚：用 toggleTask 返回的快照恢复（API 失败时调用）

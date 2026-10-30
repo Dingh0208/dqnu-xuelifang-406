@@ -41,34 +41,32 @@
 </script>
 
 <style>
-	/* 两列普通 Grid：每行两张卡片，无堆叠、无 sticky、无重叠、无 stack-spacer */
+	/* 错题列表采用整行信息卡，保留原详情点击 */
 	.stack {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		column-gap: 20rpx;
-		row-gap: 24rpx;
-		padding: 8rpx 0 40rpx;
+		display: flex;
+		flex-direction: column;
+		padding: 8rpx 0 36rpx;
 	}
 
 	/* 普通 Grid item：min-width:0 防止内容撑破列宽；卡片内部自行撑满单元格 */
 	.stack-item {
 		min-width: 0;
+		margin-bottom: 14rpx;
 	}
 
 	/* 空状态：横跨两列，居中提示 */
 	.empty-state {
-		grid-column: 1 / -1;
-		padding: 80rpx 0;
+		padding: 70rpx 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		background-color: var(--student-surface);
+		border: 1rpx solid var(--student-line);
+		border-radius: 28rpx;
 	}
 
 	.empty-text {
 		font-size: 26rpx;
-		color: #B49D82;
+		color: var(--student-muted);
 	}
 </style>

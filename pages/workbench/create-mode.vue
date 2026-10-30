@@ -1,11 +1,21 @@
 <template>
 	<view class="page">
 		<view class="page-header">
-			<text class="page-title">✨ 从零开始设计 AI 工作台</text>
+			<text class="page-title">从零开始设计 AI 工作台</text>
 			<text class="page-subtitle">通过一系列问题，让 AI 更了解你想创建的工作台。</text>
 		</view>
 
-		<!-- 三个创建模式卡片：纵向排列，视觉有层级差异 -->
+		<view v-if="pageStatus === 'loading'" class="aq-state-card">
+			<text class="aq-state-text">正在加载创建方式…</text>
+		</view>
+		<view v-else-if="pageStatus === 'error'" class="aq-state-card">
+			<text class="aq-state-text">创建方式加载失败，请稍后重试</text>
+			<view class="aq-btn aq-btn-ghost state-btn" @click="loadModes"><text>重新加载</text></view>
+		</view>
+		<view v-else-if="modes.length === 0" class="aq-state-card">
+			<text class="aq-state-text">暂无可用的创建方式</text>
+		</view>
+		<block v-else>
 		<view
 			v-for="(item, index) in modes"
 			:key="item.id"
@@ -24,6 +34,7 @@
 				<text class="mode-btn-text">{{ item.buttonText }}</text>
 			</view>
 		</view>
+		</block>
 
 		<view class="bottom-space"></view>
 	</view>
@@ -35,15 +46,25 @@
 	export default {
 		data() {
 			return {
+				pageStatus: 'loading', // loading / normal / error
 				modes: []
 			}
 		},
 		onShow() {
-			getCreateModes().then((res) => {
-				this.modes = (res && res.data && res.data.list) || []
-			})
+			this.loadModes()
 		},
 		methods: {
+			loadModes() {
+				this.pageStatus = 'loading'
+				getCreateModes()
+					.then((res) => {
+						this.modes = (res && res.data && res.data.list) || []
+						this.pageStatus = 'normal'
+					})
+					.catch(() => {
+						this.pageStatus = 'error'
+					})
+			},
 			goQuestionnaire(item) {
 				uni.navigateTo({ url: '/pages/workbench/questionnaire?mode=' + item.id })
 			}
@@ -54,50 +75,58 @@
 <style>
 	.page {
 		min-height: 100vh;
-		background-color: #F7EFE3;
-		padding: 10rpx 24rpx 0;
+		padding: 0 var(--app-page-padding);
 		box-sizing: border-box;
+		background: transparent;
 	}
 
 	.page-header {
-		padding: 28rpx 8rpx 30rpx;
+		padding: 22rpx 0 26rpx;
 	}
 
 	.page-title {
 		display: block;
 		font-size: 38rpx;
 		font-weight: 600;
-		color: #4A3520;
+		color: var(--app-ink);
 		line-height: 1.4;
 	}
 
 	.page-subtitle {
 		display: block;
 		margin-top: 12rpx;
-		font-size: 26rpx;
-		color: #8D7964;
+		font-size: 25rpx;
+		color: var(--app-muted);
 		line-height: 1.6;
 	}
 
-	.mode-card {
-		background-color: #FFFDF8;
-		border-radius: 28rpx;
-		padding: 32rpx 28rpx 30rpx;
-		margin-bottom: 28rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+	.state-btn {
+		width: 240rpx;
+		height: 72rpx;
+		margin: 24rpx auto 0;
+		font-size: 26rpx;
 	}
 
-	/* 三个创建模式层级差异：通过背景色与边框做轻微强化，不过度设计 */
+	.mode-card {
+		background-color: var(--app-surface-solid);
+		border: 1rpx solid var(--app-line);
+		border-radius: var(--app-radius);
+		padding: 30rpx 28rpx;
+		margin-bottom: 24rpx;
+		box-shadow: var(--app-shadow-soft);
+	}
+
+	/* 通过左侧薄荷色描边做层级差异，不使用两套卡片风格 */
 	.mode-level-1 {
-		border: 2rpx solid #EFE3D0;
+		border-left: 6rpx solid rgba(18, 181, 165, 0.28);
 	}
+
 	.mode-level-2 {
-		border: 2rpx solid #F0CBA0;
-		background-color: #FFFBF2;
+		border-left: 6rpx solid rgba(18, 181, 165, 0.52);
 	}
+
 	.mode-level-3 {
-		border: 2rpx solid #E8A340;
-		background-color: #FFF6E7;
+		border-left: 6rpx solid var(--app-accent);
 	}
 
 	.mode-top {
@@ -106,53 +135,61 @@
 	}
 
 	.mode-icon {
-		font-size: 60rpx;
-		line-height: 1;
+		width: 64rpx;
+		height: 64rpx;
+		border-radius: 18rpx;
+		background: rgba(18, 181, 165, 0.12);
+		color: var(--app-primary);
+		font-size: 32rpx;
+		line-height: 64rpx;
+		text-align: center;
 	}
 
 	.mode-top-text {
 		flex: 1;
-		margin-left: 22rpx;
+		margin-left: 20rpx;
 	}
 
 	.mode-title {
 		display: block;
 		font-size: 32rpx;
 		font-weight: 600;
-		color: #4A3520;
+		color: var(--app-ink);
 		line-height: 1.4;
 	}
 
 	.mode-count {
 		display: block;
 		margin-top: 6rpx;
-		font-size: 24rpx;
-		color: #B56A3C;
+		font-size: 23rpx;
+		color: #0A6B63;
 		font-weight: 500;
 	}
 
 	.mode-summary {
 		display: block;
-		margin-top: 22rpx;
+		margin-top: 20rpx;
 		font-size: 26rpx;
-		color: #8D7964;
+		color: var(--app-muted);
 		line-height: 1.6;
 	}
 
 	.mode-btn {
-		margin-top: 28rpx;
+		margin-top: 26rpx;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		padding: 20rpx 54rpx;
-		background-color: #B56A3C;
+		height: 80rpx;
+		padding: 0 48rpx;
+		background: linear-gradient(135deg, #0A5C6A 0%, #12B5A5 100%);
 		border-radius: 999rpx;
+		box-shadow: 0 8rpx 20rpx rgba(10, 92, 106, 0.18);
 	}
 
 	.mode-btn-text {
 		font-size: 28rpx;
 		font-weight: 600;
-		color: #FFFDF8;
+		color: #FFFFFF;
 	}
 
 	.bottom-space {

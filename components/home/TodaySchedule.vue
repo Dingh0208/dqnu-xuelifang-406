@@ -22,6 +22,9 @@
 					<text class="timeline-sub">{{ formatSub(item) }}</text>
 				</view>
 			</view>
+			<view v-if="schedule.length === 0" class="schedule-empty">
+				<text>今天没有学习安排</text>
+			</view>
 		</view>
 	</view>
 </template>
@@ -66,29 +69,30 @@
 
 <style>
 	.card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 32rpx 30rpx;
+		padding: 28rpx;
 		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		background: var(--app-surface, rgba(255, 255, 255, 0.90));
+		border: 1rpx solid var(--app-line, #D3E8E7);
+		border-radius: 28rpx;
+		box-shadow: var(--app-shadow-soft, 0 4rpx 14rpx rgba(10, 80, 90, 0.06));
 	}
 
 	.card-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 30rpx;
+		margin-bottom: 26rpx;
 	}
 
 	.card-title {
 		font-size: 32rpx;
 		font-weight: 600;
-		color: #4A3520;
+		color: var(--app-ink, #0D2F36);
 	}
 
 	.card-more {
-		font-size: 26rpx;
-		color: #8D7964;
+		font-size: 24rpx;
+		color: var(--app-muted, #7B9AA1);
 	}
 
 	.timeline-row {
@@ -96,16 +100,17 @@
 	}
 
 	.timeline-time {
-		width: 96rpx;
+		width: 92rpx;
 		flex-shrink: 0;
-		font-size: 28rpx;
-		color: #4A3520;
+		font-size: 26rpx;
 		font-weight: 500;
-		line-height: 42rpx;
+		line-height: 40rpx;
+		color: var(--app-primary, #0A5C6A);
+		font-variant-numeric: tabular-nums;
 	}
 
 	.timeline-middle {
-		width: 44rpx;
+		width: 40rpx;
 		flex-shrink: 0;
 		display: flex;
 		flex-direction: column;
@@ -113,25 +118,26 @@
 	}
 
 	.timeline-dot {
-		width: 16rpx;
-		height: 16rpx;
-		border-radius: 50%;
-		background-color: #E8A340;
+		width: 14rpx;
+		height: 14rpx;
 		margin-top: 13rpx;
+		border-radius: 50%;
+		background: var(--app-accent, #12B5A5);
+		box-shadow: 0 0 0 6rpx rgba(18, 181, 165, 0.12);
 		flex-shrink: 0;
 	}
 
-	/* 时间线：非常浅的暖色 */
 	.timeline-line {
 		width: 2rpx;
 		flex: 1;
-		background-color: #F1E4CC;
-		margin: 6rpx 0;
+		margin: 8rpx 0;
+		background: var(--app-line, #D3E8E7);
 	}
 
 	.timeline-content {
 		flex: 1;
-		padding-bottom: 36rpx;
+		min-width: 0;
+		padding-bottom: 32rpx;
 	}
 
 	.timeline-row.last-row .timeline-content {
@@ -140,16 +146,28 @@
 
 	.timeline-title {
 		display: block;
-		font-size: 30rpx;
-		color: #4A3520;
+		font-size: 29rpx;
 		font-weight: 500;
-		line-height: 42rpx;
+		line-height: 40rpx;
+		color: var(--app-ink, #0D2F36);
 	}
 
 	.timeline-sub {
 		display: block;
-		font-size: 24rpx;
-		color: #8D7964;
-		margin-top: 8rpx;
+		margin-top: 6rpx;
+		font-size: 23rpx;
+		line-height: 1.5;
+		color: var(--app-muted, #7B9AA1);
+	}
+
+	.schedule-empty {
+		padding: 36rpx 0 20rpx;
+		text-align: center;
+	}
+
+	.schedule-empty text {
+		font-size: 25rpx;
+		line-height: 1.6;
+		color: var(--app-muted, #7B9AA1);
 	}
 </style>

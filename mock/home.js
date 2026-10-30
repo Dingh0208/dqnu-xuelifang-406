@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // Mock 数据层（当前阶段唯一数据来源，USE_MOCK = true 时由 api/home.js 调用）
 // 数据结构与未来 Spring Boot 接口返回完全一致，后端接入后页面无需改动。
 //
@@ -13,7 +13,10 @@
 import { completionRateByCount, todayRewardCoins } from '@/utils/reward.js'
 // 任务状态单一来源（Bug-1）：种子任务注册到共享状态，fetch 直接返回同一引用
 // patchTask 直接调用共享状态的 set/get，避免 completed 值与 toggle 不同步
-import { initTaskState } from '@/utils/taskState.js'
+import { initTaskState, addTask, setTaskStateContext, getTasksByFilter } from '@/utils/taskState.js'
+// StudentTask 共享数据源：学生完成班级任务时回写教师端进度
+import { completeStudentTask, uncompleteStudentTask, createStudentTasksForTask, getStudentTask } from '@/mock/studentTask.js'
+import { getActiveMemberUserIds } from '@/mock/class.js'
 
 // ---------- 今日任务（weight 字段保留在数据结构中；学习金币奖励按「任务数等权」计算，见 utils/reward.js） ----------
 var tasks = [
@@ -22,6 +25,7 @@ var tasks = [
 		title: '英语四级词汇',
 		description: '新学40个高频词汇',
 		type: 'study',
+		source: 'ai',
 		estimatedMinutes: 40,
 		weight: 20,
 		completed: true
@@ -31,6 +35,7 @@ var tasks = [
 		title: '数据结构 · 链表',
 		description: '掌握单链表基本操作',
 		type: 'study',
+		source: 'ai',
 		estimatedMinutes: 50,
 		weight: 30,
 		completed: false
@@ -40,6 +45,7 @@ var tasks = [
 		title: '高等数学 · 极限',
 		description: '复习函数极限基础',
 		type: 'review',
+		source: 'ai',
 		estimatedMinutes: 30,
 		weight: 30,
 		completed: false
@@ -49,7 +55,32 @@ var tasks = [
 		title: '错题复习',
 		description: '复习5道历史错题',
 		type: 'review',
+		source: 'ai',
 		estimatedMinutes: 30,
+		weight: 20,
+		completed: false
+	},
+	{
+		id: 2101,
+		title: '完成二分查找练习',
+		description: '班级任务：完成二分查找专项练习',
+		type: 'study',
+		source: 'class',
+		classId: 'class-001',
+		teacherTaskId: 't-3001',
+		estimatedMinutes: 30,
+		weight: 20,
+		completed: false
+	},
+	{
+		id: 2102,
+		title: '完成英语阅读理解',
+		description: '班级任务：完成一篇英语阅读理解',
+		type: 'review',
+		source: 'class',
+		classId: 'class-001',
+		teacherTaskId: 't-3002',
+		estimatedMinutes: 20,
 		weight: 20,
 		completed: false
 	}
@@ -58,6 +89,10 @@ var tasks = [
 // 注册到共享任务状态（Bug-1 单一来源：此后 tasks 即共享数组本身，patch 真正写回；
 // 当天 storage 状态在此一次性恢复，跨天残留直接忽略）
 initTaskState(tasks)
+
+// 固定教师 Mock 任务也遵循 StudentTask 受众，不能仅因设备共享而对所有学生可见。
+createStudentTasksForTask({ id: 't-3001', classId: 'class-001' }, getActiveMemberUserIds('class-001'))
+createStudentTasksForTask({ id: 't-3002', classId: 'class-001' }, getActiveMemberUserIds('class-001'))
 
 // ---------- 今日学习安排（Schedule；type: class/study/review，status: completed/current/upcoming） ----------
 var schedule = [
@@ -117,35 +152,52 @@ function pickMessage() {
 	return welcomeMessages[idx]
 }
 
-function buildWelcome() {
-	var totalMinutes = tasks.reduce(function (sum, t) {
+function buildWelcome(studentTasks) {
+	var totalMinutes = studentTasks.reduce(function (sum, t) {
 		return sum + (t.estimatedMinutes || 0)
 	}, 0)
 	return {
 		greeting: buildGreeting(),
 		message: pickMessage(),
-		todayTaskCount: tasks.length,
+		todayTaskCount: studentTasks.length,
 		estimatedStudyMinutes: totalMinutes
 	}
 }
 
 // 完成度：已完成任务数量 ÷ 今日任务总数量（所有任务等权；任务完成状态是唯一源数据，完成度/金币均为计算结果）
-function calcCompletionRate() {
-	var completed = tasks.filter(function (t) {
+function getVisibleTasks() {
+	var userId = getCurrentStudentUserId()
+	var visible = []
+	for (var i = 0; i < tasks.length; i++) {
+		var task = tasks[i]
+		var copy = Object.assign({}, task)
+		if (task.source === 'class') {
+			var assignment = getStudentTask(task.teacherTaskId, userId)
+			if (!assignment) continue
+			copy.completed = assignment.status === 'completed'
+		}
+		visible.push(copy)
+	}
+	setTaskStateContext(visible)
+	return getTasksByFilter('all')
+}
+
+function calcCompletionRate(studentTasks) {
+	var completed = studentTasks.filter(function (t) {
 		return t.completed === true
 	}).length
-	return completionRateByCount(completed, tasks.length)
+	return completionRateByCount(completed, studentTasks.length)
 }
 
 // ---------- 以下函数模拟各 API 的返回体（{ code, message, data }） ----------
 
 // GET /api/student/home/today（首页聚合接口）
 export function fetchHomeToday() {
+	var studentTasks = getVisibleTasks()
 	return ok({
 		date: todayStr(),
-		welcome: buildWelcome(),
-		// 种子数组即 taskState 持有的同一引用（initTaskState 注册后顺序/完成态统一由 taskState 维护）
-		tasks: tasks,
+		welcome: buildWelcome(studentTasks),
+		tasks: studentTasks,
 		schedule: deepCopy(schedule),
 		reviews: deepCopy(reviews),
 		studyDuration: studyDurationMinutes
@@ -154,25 +206,77 @@ export function fetchHomeToday() {
 
 // GET /api/student/home/welcome
 export function fetchWelcome() {
-	return ok(buildWelcome())
+	var studentTasks = getVisibleTasks()
+	return ok(buildWelcome(studentTasks))
 }
 
 // GET /api/student/home/today/tasks
 export function fetchTasks() {
-	return ok({ date: todayStr(), tasks: tasks })
+	return ok({ date: todayStr(), tasks: getVisibleTasks() })
 }
 
 // PATCH /api/student/home/today/tasks/{taskId}
 // Mock 阶段：taskState.toggleTask 已完成状态与顺序变更（页面先调用），
 // 此处仅回显确认（completed 与当前状态一致）；未来真实后端以接口返回为权威。
+// 若为班级任务（source==='class'），同步回写 StudentTask，打通教师端进度统计。
 export function patchTask(taskId, completed) {
+	var userId = getCurrentStudentUserId()
+	var target = null
 	for (var i = 0; i < tasks.length; i++) {
 		if (tasks[i].id === taskId) {
-			tasks[i].completed = completed
+			target = tasks[i]
 			break
 		}
 	}
+	if (!target) return { code: 404, message: '任务不存在', data: null }
+	if (target.source === 'class' && target.teacherTaskId) {
+		var assignment = getStudentTask(target.teacherTaskId, userId)
+		if (!assignment) return { code: 403, message: '你没有该任务的完成权限', data: null }
+		var changed = completed
+			? completeStudentTask(target.teacherTaskId, userId)
+			: uncompleteStudentTask(target.teacherTaskId, userId)
+		if (!changed && (assignment.status === 'completed') !== completed) {
+			return { code: 403, message: '任务状态更新失败', data: null }
+		}
+	}
 	return ok({ taskId: taskId, completed: completed })
+}
+
+// 获取当前登录学生 userId（account）。Mock 阶段无真实会话时回退 null。
+function getCurrentStudentUserId() {
+	try {
+		var info = uni.getStorageSync('login_user_info')
+		if (info && info.account) return info.account
+	} catch (e) {}
+	return null
+}
+
+// 教师端创建班级任务后同步到学生端今日任务。
+// 任务目录在设备内共享，但只有有 StudentTask 分配记录的成员可见、可完成。
+var classTaskSeq = 2201
+export function addClassTask(payload) {
+	for (var i = 0; i < tasks.length; i++) {
+		if (tasks[i].teacherTaskId === payload.id) return tasks[i]
+	}
+	var task = {
+		id: classTaskSeq++,
+		teacherTaskId: payload.id,           // 教师端 Task.id，学生完成时回写 StudentTask 的 key
+		title: payload.title,
+		description: payload.description ? '班级任务：' + payload.description : '班级任务',
+		type: 'study',
+		source: 'class',
+		classId: payload.classId,
+		estimatedMinutes: 30,
+		weight: 20,
+		completed: false
+	}
+	tasks.push(task)
+	createStudentTasksForTask(
+		{ id: payload.id, classId: payload.classId },
+		getActiveMemberUserIds(payload.classId)
+	)
+	addTask(task)
+	return task
 }
 
 // GET /api/student/home/schedule
@@ -188,13 +292,14 @@ export function fetchReviews() {
 // GET /api/student/rewards/today（今日预计学习金币为完成度派生值，实时计算、不做累加计数；
 // 账户真实金币余额以后端结算为权威，见 api/assets.js 的 coins）
 export function fetchRewards() {
-	var completed = tasks.filter(function (t) {
+	var studentTasks = getVisibleTasks()
+	var completed = studentTasks.filter(function (t) {
 		return t.completed === true
 	}).length
-	var rate = calcCompletionRate()
+	var rate = calcCompletionRate(studentTasks)
 	return ok({
 		completionRate: rate,
-		todayRewardCoins: todayRewardCoins(completed, tasks.length),
+		todayRewardCoins: todayRewardCoins(completed, studentTasks.length),
 		dailyLimit: 10
 	})
 }

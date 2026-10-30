@@ -38,14 +38,14 @@
 
 <style>
 	.membership-card {
-		background: linear-gradient(135deg, #FBF4E8 0%, #F3E6D0 100%);
+		background: linear-gradient(135deg, var(--student-surface-soft) 0%, var(--student-surface-soft) 100%);
 		border-radius: 24rpx;
 		padding: 30rpx 28rpx;
 		margin-bottom: 24rpx;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		box-shadow: 0 4rpx 14rpx rgba(140, 90, 60, 0.08);
+		box-shadow: 0 4rpx 14rpx var(--student-shadow-soft);
 	}
 
 	.left {
@@ -71,13 +71,13 @@
 	.title {
 		font-size: 30rpx;
 		font-weight: 600;
-		color: #6A4A28;
+		color: var(--student-ink);
 	}
 
 	.desc {
 		margin-top: 8rpx;
 		font-size: 23rpx;
-		color: #8D7964;
+		color: var(--student-muted);
 	}
 
 	.right {
@@ -89,15 +89,15 @@
 
 	.badge {
 		font-size: 21rpx;
-		color: #B56A3C;
+		color: var(--student-dark);
 		padding: 4rpx 14rpx;
-		border: 1rpx solid #E0B489;
+		border: 1rpx solid var(--student-line);
 		border-radius: 999rpx;
 		margin-bottom: 8rpx;
 	}
 
 	.entry {
 		font-size: 23rpx;
-		color: #A88860;
+		color: var(--student-muted);
 	}
 </style>

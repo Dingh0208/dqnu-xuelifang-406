@@ -21,13 +21,39 @@
 		{
 			"path": "pages/teacher/home",
 			"style": {
-				"navigationBarTitleText": "老师主页"
+				"navigationBarTitleText": "老师主页",
+				"navigationStyle": "custom"
 			}
 		},
 		{
 			"path": "pages/parent/home",
 			"style": {
-				"navigationBarTitleText": "家长主页"
+				"navigationBarTitleText": "成长陪伴",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/parent/report",
+			"style": {
+				"navigationBarTitleText": "学习周报",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/parent/children",
+			"style": {
+				"navigationBarTitleText": "孩子与成长",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/parent/profile",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"navigationStyle": "custom"
 			}
 		},
 		{
@@ -52,6 +78,13 @@
 			"path": "pages/workbench/index",
 			"style": {
 				"navigationBarTitleText": "工作台"
+			}
+		},
+		{
+			"path": "pages/workbench/assistant",
+			"style": {
+				"navigationBarTitleText": "小筑 AI",
+				"navigationStyle": "custom"
 			}
 		},
 		{
@@ -143,13 +176,123 @@
 			"style": {
 				"navigationBarTitleText": "关于学立方"
 			}
+		},
+		{
+			"path": "pages/class/index",
+			"style": {
+				"navigationBarTitleText": "我的班级"
+			}
+		},
+		{
+			"path": "pages/class/detail",
+			"style": {
+				"navigationBarTitleText": "班级详情"
+			}
+		},
+		{
+			"path": "pages/class/join",
+			"style": {
+				"navigationBarTitleText": "加入班级"
+			}
+		},
+		{
+			"path": "pages/teacher/class/create",
+			"style": {
+				"navigationBarTitleText": "创建班级",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/class/index",
+			"style": {
+				"navigationBarTitleText": "班级中心",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/class/detail",
+			"style": {
+				"navigationBarTitleText": "班级详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/class/members",
+			"style": {
+				"navigationBarTitleText": "班级成员",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/task/index",
+			"style": {
+				"navigationBarTitleText": "任务管理",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/task/create",
+			"style": {
+				"navigationBarTitleText": "创建任务",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/task/detail",
+			"style": {
+				"navigationBarTitleText": "任务详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/task/progress",
+			"style": {
+				"navigationBarTitleText": "完成进度",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/teaching/index",
+			"style": {
+				"navigationBarTitleText": "作业",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/student/detail",
+			"style": {
+				"navigationBarTitleText": "学生详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/class/analytics",
+			"style": {
+				"navigationBarTitleText": "班级学习数据",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/profile/index",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/module/index",
+			"style": {
+				"navigationBarTitleText": "教师工具",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true
+			}
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
+		"navigationBarTitleText": "学立方",
+		"navigationBarBackgroundColor": "#EDF8F7",
+		"backgroundColor": "#EDF8F7"
 	},
 	"uniIdRouter": {}
 }

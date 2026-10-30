@@ -46,12 +46,13 @@
 
 <style>
 	.list-empty {
-		padding: 60rpx 0 30rpx;
+		padding: 56rpx 0 28rpx;
 		text-align: center;
 	}
 
 	.list-empty-text {
-		font-size: 26rpx;
-		color: #8D7964;
+		font-size: 25rpx;
+		line-height: 1.6;
+		color: var(--app-muted, #7B9AA1);
 	}
 </style>

@@ -7,6 +7,8 @@
 			:key="f.key"
 			class="filter-pill"
 			:class="{ active: current === f.key }"
+			hover-class="filter-pill-hover"
+			:hover-stay-time="80"
 			@click="onSelect(f.key)"
 		>
 			<text class="filter-text">{{ f.label }}</text>
@@ -43,11 +45,10 @@
 </script>
 
 <style>
-	/* 视觉沿用错题本三分类（filter-pill）语言：暖棕系，选中 #B56A3C 底白字 */
 	.filter-row {
 		display: flex;
 		align-items: center;
-		margin: 8rpx 8rpx 20rpx;
+		margin: 8rpx 4rpx 20rpx;
 	}
 
 	.filter-pill {
@@ -57,27 +58,31 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: 999rpx;
-		background-color: #FFF9EE;
-		border: 1rpx solid #E0C9A6;
-		margin-right: 16rpx;
+		background: var(--app-surface-soft, #E2F3F2);
+		border: 1rpx solid var(--app-line, #D3E8E7);
 	}
 
-	.filter-pill:last-child {
-		margin-right: 0;
+	.filter-pill + .filter-pill {
+		margin-left: 14rpx;
+	}
+
+	.filter-pill-hover {
+		opacity: 0.82;
 	}
 
 	.filter-pill.active {
-		background-color: #B56A3C;
-		border-color: #B56A3C;
+		border-color: transparent;
+		background: linear-gradient(135deg, var(--app-primary, #0A5C6A) 0%, var(--app-accent, #12B5A5) 100%);
+		box-shadow: 0 6rpx 16rpx rgba(10, 92, 106, 0.16);
 	}
 
 	.filter-text {
-		font-size: 26rpx;
-		color: #8D7964;
+		font-size: 25rpx;
+		color: var(--app-copy, #44666E);
 	}
 
 	.filter-pill.active .filter-text {
 		color: #FFFFFF;
-		font-weight: 500;
+		font-weight: 600;
 	}
 </style>

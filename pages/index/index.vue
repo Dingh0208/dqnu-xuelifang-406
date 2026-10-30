@@ -1,7 +1,14 @@
-﻿<template>
-	<view class="page">
-		<view class="page-header">
-			<text class="page-title">今日学习驾驶舱</text>
+<template>
+	<view class="page student-page">
+		<view class="welcome-row">
+			<view class="avatar">
+				<image v-if="profile.avatar" class="avatar-img" :src="profile.avatar" mode="aspectFill" />
+				<text v-else>{{ profile.avatarText || (profile.nickname || '同')[0] }}</text>
+			</view>
+			<view class="welcome-copy">
+				<text class="page-title">{{ greeting || '早上好' }}，{{ profile.nickname || '同学' }}</text>
+				<text class="welcome-sub">今天也按自己的节奏，做好眼前这几件事</text>
+			</view>
 		</view>
 
 		<today-progress
@@ -10,11 +17,18 @@
 			:percent="completionPercent"
 			:coins="todayRewardCoins"
 			:study-time="studyTime"
+			@more="goTasks"
 		/>
 
-		<today-schedule :schedule="schedule" @more="goSchedule" />
-
-		<today-tasks :tasks="pendingTasks" @toggle="toggleTask" @more="goTasks" />
+		<today-tasks
+			:tasks="todayTasks"
+			:empty-text="homeEmptyText"
+			:empty-action-text="homeEmptyActionText"
+			@toggle="toggleTask"
+			@more="goTasks"
+			@start="startFocus"
+			@empty-action="handleHomeEmptyAction"
+		/>
 
 		<today-review :reviews="reviews" @more="goReview" />
 
@@ -32,18 +46,27 @@
 			:estimated-text="welcomeEstimatedText"
 			@close="closeWelcome"
 		/>
+
+		<!-- 专注学习浮层：从任务预计时长倒计时，完成后一键打卡 -->
+		<focus-overlay
+			:visible="focusVisible"
+			:task="focusTask"
+			@close="closeFocus"
+			@complete="completeFocus"
+		/>
 	</view>
 </template>
 
 <script>
 	import TodayProgress from '@/components/home/TodayProgress.vue'
-	import TodaySchedule from '@/components/home/TodaySchedule.vue'
 	import TodayTasks from '@/components/home/TodayTasks.vue'
 	import TodayReview from '@/components/home/TodayReview.vue'
 	import BottomTabBar from '@/components/common/BottomTabBar.vue'
 	import WelcomeModal from '@/components/home/WelcomeModal.vue'
+	import FocusOverlay from '@/components/home/FocusOverlay.vue'
 	// 页面只依赖 api 层；USE_MOCK=true 时 api 层内部返回 Mock，后端接入后页面无需改动
 	import * as homeApi from '@/api/home.js'
+	import { getMyPage } from '@/api/my.js'
 	// 学习金币奖励纯计算（今日预计金币：每完成约 10% 任务得 1 枚，0～10）
 	import { completionRateByCount, todayRewardCoins as calcTodayRewardCoins } from '@/utils/reward.js'
 	// 任务状态单一来源（Bug-1）：首页与今日计划共享同一份任务数组，翻转/排序/持久化统一在此
@@ -83,18 +106,18 @@
 	export default {
 		components: {
 			TodayProgress,
-			TodaySchedule,
 			TodayTasks,
 			TodayReview,
 			BottomTabBar,
-			WelcomeModal
+			WelcomeModal,
+			FocusOverlay
 		},
 		data() {
 			return {
-				tasks: [],          // 首页「今日计划」卡片只放未完成任务（taskState 返回的新数组）
+				tasks: [],          // 首页按 taskState 顺序展示待完成任务（getPendingTasks）
 				statCompleted: 0,   // 今日已完成数（统计/完成度/金币用，来自唯一状态源）
 				statTotal: 0,       // 今日任务总数
-				schedule: [],
+				profile: { avatar: '', avatarText: '学', nickname: '同学' },
 				reviews: [],
 				studyTime: '',
 				greeting: '',
@@ -102,6 +125,9 @@
 				welcomeTaskCount: 0,
 				welcomeEstimatedText: '',
 				welcomeVisible: false,
+				// 专注浮层状态
+				focusVisible: false,
+				focusTask: null,
 				// 单任务 toggle 并发锁（同一任务请求进行期间禁止重复提交）
 				taskLocks: {}
 			}
@@ -128,14 +154,26 @@
 			// 【2026-09 重写】首页「今日计划」卡片只显示未完成任务（completed === false）：
 			// 纯 filter 展示，完成任务从首页卡片自然消失（数据仍保留在 this.tasks 全量中，
 			// 完成度/金币统计不受影响）；顺序 = 原始顺序，不做任何排序
-			pendingTasks() {
-				return this.tasks.filter(function (t) {
-					return t.completed === false
-				})
+			todayTasks() {
+				return this.tasks
+			},
+			// 空态文案与行动入口：把「没有任务/全部完成」升级为可执行的下一步
+			homeEmptyText() {
+				if (this.statTotal === 0) return '今天还没有任务，先给自己安排一件小事吧'
+				if (this.statCompleted >= this.statTotal) return '今日任务已全部完成，给自己点个赞'
+				return ''
+			},
+			homeEmptyActionText() {
+				if (this.statTotal === 0) return '去制定今日计划'
+				if (this.statCompleted >= this.statTotal) return '去复习错题'
+				return ''
 			}
 		},
 		onLoad() {
 			this.loadHome()
+			getMyPage().then((res) => {
+				this.profile = (res && res.data && res.data.profile) || this.profile
+			}).catch(() => {})
 		},
 		// 从今日计划/其他页面返回时，重新读取唯一状态源（新数组整体替换，状态自然一致）
 		onShow() {
@@ -148,14 +186,13 @@
 			loadHome() {
 				homeApi.getHomeToday().then((res) => {
 					var d = res.data
-					this.schedule = d.schedule
 					this.reviews = d.reviews
 					this.studyTime = formatStudyDuration(d.studyDuration)
 					this.greeting = d.welcome.greeting
 					this.welcomeMessage = d.welcome.message
 					this.welcomeTaskCount = d.welcome.todayTaskCount
 					this.welcomeEstimatedText = formatEstimated(d.welcome.estimatedStudyMinutes)
-					// 任务数据从唯一状态源读取（卡片只放未完成任务，新数组整体替换）
+					// 任务数据从唯一状态源读取（新数组整体替换）
 					this.refreshTasks()
 					this.checkWelcome()
 				})
@@ -191,6 +228,30 @@
 					})
 					.then(unlock, unlock)
 			},
+			// ===== 专注学习浮层 =====
+			startFocus(task) {
+				this.focusTask = task
+				this.focusVisible = true
+			},
+			closeFocus() {
+				this.focusVisible = false
+				this.focusTask = null
+			},
+			// 专注完成 → 标记任务完成（复用统一 toggle；已完成的任务不会重复翻转）
+			completeFocus(task) {
+				this.closeFocus()
+				if (task && !task.completed) {
+					this.toggleTask(task)
+				}
+			},
+			// 空态行动：无任务 → 去工作台/AI 制定计划；全完成 → 去错题本复习
+			handleHomeEmptyAction() {
+				if (this.statTotal === 0) {
+					uni.navigateTo({ url: '/pages/workbench/index' })
+				} else {
+					uni.navigateTo({ url: '/pages/wrongbook/index' })
+				}
+			},
 			// ===== 三个“查看全部”跳转（二级页面，navigateTo 保留返回） =====
 			goSchedule() {
 				uni.navigateTo({ url: '/pages/schedule/index' })
@@ -225,21 +286,60 @@
 <style>
 	.page {
 		min-height: 100vh;
-		background-color: #F7EFE3;
-		padding: 10rpx 24rpx 0;
+		padding: 12rpx 32rpx 0;
 		box-sizing: border-box;
+	}
+
+	.welcome-row {
+		display: flex;
+		align-items: center;
+		padding: 24rpx 8rpx 28rpx;
+	}
+
+	.avatar {
+		width: 84rpx;
+		height: 84rpx;
+		border-radius: 28rpx;
+		background: linear-gradient(135deg, var(--app-primary, #0A5C6A) 0%, var(--app-accent, #12B5A5) 100%);
+		color: #FFFFFF;
+		font-size: 38rpx;
+		font-weight: 600;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		overflow: hidden;
+		box-shadow: 0 8rpx 18rpx rgba(10, 92, 106, 0.18);
+	}
+
+	.avatar-img {
+		width: 100%;
+		height: 100%;
+	}
+
+	.welcome-copy {
+		min-width: 0;
+		margin-left: 20rpx;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.page-title {
 		display: block;
-		font-size: 40rpx;
+		font-size: 38rpx;
 		font-weight: 600;
-		color: #4A3520;
-		padding: 28rpx 8rpx 26rpx;
+		color: var(--app-ink, #0D2F36);
+		line-height: 1.35;
+	}
+
+	.welcome-sub {
+		margin-top: 6rpx;
+		font-size: 24rpx;
+		line-height: 1.5;
+		color: var(--app-muted, #7B9AA1);
 	}
 
 	.bottom-space {
-		height: 160rpx;
-		height: calc(160rpx + env(safe-area-inset-bottom));
+		height: calc(132rpx + env(safe-area-inset-bottom));
 	}
 </style>

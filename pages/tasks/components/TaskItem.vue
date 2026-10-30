@@ -1,8 +1,8 @@
 <template>
 	<!-- 单个任务项（纯展示）：checkbox 视觉唯一来源 = task.completed；
-	     未完成 □ / 完成 黄底白 ✓，无第二套状态、无动画、无强制刷新 -->
+	     未完成 白底描边 / 完成 薄荷青底白 ✓，无第二套状态、无动画 -->
 	<view class="task-row" :class="{ 'last-row': isLast }">
-		<view class="checkbox-hit" @click="onToggle">
+		<view class="checkbox-hit" hover-class="checkbox-hit-hover" :hover-stay-time="80" @click="onToggle">
 			<view class="task-checkbox" :class="{ checked: task.completed }">
 				<!-- ✓ 节点常驻 + v-show 切换（mp 端属性级更新稳定），勿改回 v-if -->
 				<text v-show="task.completed" class="check-mark">✓</text>
@@ -12,13 +12,20 @@
 			<text class="task-title" :class="{ 'task-done': task.completed }">{{ task.title }}</text>
 			<text class="task-desc">{{ task.description }}</text>
 		</view>
+		<!-- 班级任务小标签（仅 source === 'class' 显示，AI 任务无标签） -->
+		<class-task-badge :source="task.source" />
 		<text class="task-duration">{{ task.estimatedMinutes }}分钟</text>
 	</view>
 </template>
 
 <script>
+	import ClassTaskBadge from '@/components/common/ClassTaskBadge.vue'
+
 	export default {
 		name: 'TaskItem',
+		components: {
+			ClassTaskBadge
+		},
 		props: {
 			task: {
 				type: Object,
@@ -39,77 +46,93 @@
 </script>
 
 <style>
-	/* 视觉沿用首页 TodayTasks 任务行：暖棕系卡片行样式，保持一致 */
 	.task-row {
+		/* 让仍引用旧 token 的 ClassTaskBadge 在组件内也拿到 Aqua 色值 */
+		--student-line: #D3E8E7;
+		--student-surface-soft: #E2F3F2;
+		--student-muted: #7B9AA1;
 		display: flex;
 		align-items: flex-start;
-		padding: 26rpx 0;
-		border-bottom: 1rpx solid #EFE3D0;
+		padding: 20rpx 0;
+		border-bottom: 1rpx solid var(--app-line, #D3E8E7);
 	}
 
 	.task-row.last-row {
 		border-bottom: none;
-		padding-bottom: 8rpx;
+		padding-bottom: 4rpx;
 	}
 
 	.checkbox-hit {
-		padding: 6rpx 16rpx 6rpx 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 88rpx;
+		height: 88rpx;
+		margin: -16rpx 0 -16rpx -16rpx;
 		flex-shrink: 0;
+	}
+
+	.checkbox-hit-hover {
+		opacity: 0.76;
 	}
 
 	.task-checkbox {
 		width: 44rpx;
 		height: 44rpx;
-		border-radius: 12rpx;
 		box-sizing: border-box;
-		background-color: #FFF9EE;
-		border: 2rpx solid #E0C9A6;
+		border-radius: 14rpx;
+		background: var(--app-surface-solid, #FFFFFF);
+		border: 2rpx solid var(--app-line, #D3E8E7);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
 	.task-checkbox.checked {
-		background-color: #E8A340;
-		border-color: #E8A340;
+		background: var(--app-positive, #0E9F86);
+		border-color: var(--app-positive, #0E9F86);
 	}
 
 	.check-mark {
 		font-size: 26rpx;
 		font-weight: 700;
-		color: #FFFFFF;
 		line-height: 1;
+		color: #FFFFFF;
 	}
 
 	.task-info {
 		flex: 1;
 		min-width: 0;
+		padding-top: 2rpx;
 	}
 
 	.task-title {
 		display: block;
-		font-size: 30rpx;
-		color: #4A3520;
+		font-size: 29rpx;
 		font-weight: 500;
-		line-height: 44rpx;
+		line-height: 42rpx;
+		color: var(--app-ink, #0D2F36);
 	}
 
 	.task-title.task-done {
-		color: #9C8874;
+		color: var(--app-muted, #7B9AA1);
+		text-decoration: line-through;
 	}
 
 	.task-desc {
 		display: block;
-		font-size: 24rpx;
-		color: #8D7964;
-		margin-top: 8rpx;
+		margin-top: 6rpx;
+		font-size: 23rpx;
+		line-height: 1.5;
+		color: var(--app-muted, #7B9AA1);
 	}
 
 	.task-duration {
 		flex-shrink: 0;
-		margin-left: 16rpx;
-		padding-top: 8rpx;
-		font-size: 26rpx;
-		color: #8D7964;
+		margin-left: 14rpx;
+		padding-top: 6rpx;
+		font-size: 23rpx;
+		color: var(--app-muted, #7B9AA1);
+		font-variant-numeric: tabular-nums;
 	}
 </style>

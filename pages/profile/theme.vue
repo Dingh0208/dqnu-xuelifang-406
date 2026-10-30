@@ -4,6 +4,14 @@
 			<text class="page-title">主题</text>
 		</view>
 
+		<view v-if="pageStatus === 'loading'" class="aq-state-card">
+			<text class="aq-state-text">正在加载主题设置…</text>
+		</view>
+		<view v-else-if="pageStatus === 'error'" class="aq-state-card">
+			<text class="aq-state-text">主题设置加载失败，请稍后重试</text>
+			<view class="aq-btn aq-btn-ghost state-btn" @click="loadTheme"><text>重新加载</text></view>
+		</view>
+		<block v-else>
 		<!-- 当前使用（首页视觉主题） -->
 		<view class="card">
 			<text class="card-title">首页主题</text>
@@ -48,6 +56,7 @@
 				</view>
 			</view>
 		</view>
+		</block>
 
 		<view class="bottom-space"></view>
 	</view>
@@ -67,6 +76,7 @@
 	export default {
 		data() {
 			return {
+				pageStatus: 'loading', // loading / normal / error
 				// 主题状态：currentTheme / homeTheme / workbenchTheme / syncWorkbenchTheme
 				form: {
 					currentTheme: 'default',
@@ -91,14 +101,16 @@
 		},
 		methods: {
 			loadTheme() {
+				this.pageStatus = 'loading'
 				getTheme()
 					.then((res) => {
 						this.form = res.data || this.form
 						// 工作台主题与首页主题不一致时，才展示同步询问
 						this.syncPending = isThemeSyncPending(this.form)
+						this.pageStatus = 'normal'
 					})
 					.catch(() => {
-						uni.showToast({ title: '主题加载失败', icon: 'none' })
+						this.pageStatus = 'error'
 					})
 			},
 			// 切换首页主题（当前仅默认主题可选；后续新增主题无需改页面结构）
@@ -145,40 +157,48 @@
 <style>
 	.page {
 		min-height: 100vh;
-		background-color: #F7EFE3;
-		padding: 10rpx 24rpx 0;
+		padding: 0 var(--app-page-padding);
 		box-sizing: border-box;
+		background: transparent;
 	}
 
 	.page-title {
 		display: block;
-		font-size: 40rpx;
+		font-size: 38rpx;
 		font-weight: 600;
-		color: #4A3520;
-		padding: 28rpx 8rpx 26rpx;
+		color: var(--app-ink);
+		padding: 22rpx 0 22rpx;
+	}
+
+	.state-btn {
+		width: 240rpx;
+		height: 72rpx;
+		margin: 24rpx auto 0;
+		font-size: 26rpx;
 	}
 
 	.card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 28rpx 30rpx;
-		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		background-color: var(--app-surface-solid);
+		border: 1rpx solid var(--app-line);
+		border-radius: var(--app-radius);
+		padding: 28rpx;
+		margin-bottom: 22rpx;
+		box-shadow: var(--app-shadow-soft);
 	}
 
 	.card-title {
 		display: block;
-		font-size: 28rpx;
+		font-size: 30rpx;
 		font-weight: 600;
-		color: #4A3520;
-		margin-bottom: 18rpx;
+		color: var(--app-ink);
+		margin-bottom: 16rpx;
 	}
 
 	.option-row {
 		display: flex;
 		align-items: center;
 		padding: 22rpx 0;
-		border-top: 1rpx solid #EFE3D0;
+		border-top: 1rpx solid var(--app-line);
 	}
 
 	.option-row.static {
@@ -188,8 +208,8 @@
 	.radio {
 		width: 36rpx;
 		height: 36rpx;
-		border-radius: 18rpx;
-		border: 2rpx solid #D8C4A6;
+		border-radius: 50%;
+		border: 2rpx solid var(--app-line);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -197,33 +217,36 @@
 	}
 
 	.radio.on {
-		border-color: #B56A3C;
+		border-color: var(--app-accent);
 	}
 
 	.radio-dot {
 		width: 18rpx;
 		height: 18rpx;
-		border-radius: 9rpx;
-		background-color: #B56A3C;
+		border-radius: 50%;
+		background: var(--app-accent);
 	}
 
 	.option-name {
 		margin-left: 20rpx;
 		flex: 1;
 		font-size: 28rpx;
-		color: #4A3520;
+		color: var(--app-ink);
 	}
 
 	.option-tag {
+		padding: 6rpx 16rpx;
+		border-radius: 999rpx;
+		background: rgba(18, 181, 165, 0.10);
 		font-size: 22rpx;
-		color: #B56A3C;
+		color: #0A6B63;
 	}
 
 	.card-note {
 		display: block;
-		margin-top: 18rpx;
+		margin-top: 16rpx;
 		font-size: 23rpx;
-		color: #B49D82;
+		color: var(--app-hint);
 		line-height: 1.6;
 	}
 
@@ -235,37 +258,38 @@
 
 	.wb-empty-text {
 		font-size: 27rpx;
-		color: #B49D82;
+		color: var(--app-hint);
 	}
 
 	.wb-empty-sub {
 		margin-top: 10rpx;
 		font-size: 23rpx;
-		color: #C6B092;
+		color: var(--app-hint);
 		line-height: 1.6;
 	}
 
 	/* 同步提示卡：克制、轻量，不做强营销视觉 */
 	.sync-card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 30rpx 30rpx;
-		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		background-color: var(--app-surface-solid);
+		border: 1rpx solid var(--app-line);
+		border-radius: var(--app-radius);
+		padding: 28rpx;
+		margin-bottom: 22rpx;
+		box-shadow: var(--app-shadow-soft);
 	}
 
 	.sync-title {
 		display: block;
-		font-size: 28rpx;
+		font-size: 30rpx;
 		font-weight: 600;
-		color: #4A3520;
+		color: var(--app-ink);
 	}
 
 	.sync-desc {
 		display: block;
 		margin-top: 12rpx;
 		font-size: 24rpx;
-		color: #8D7964;
+		color: var(--app-muted);
 		line-height: 1.6;
 	}
 
@@ -282,11 +306,13 @@
 	}
 
 	.sync-btn.ghost {
-		border: 1rpx solid #E0C8A8;
+		border: 1rpx solid var(--app-line);
+		background: var(--app-surface-solid);
 	}
 
 	.sync-btn.primary {
-		background-color: #B56A3C;
+		background: linear-gradient(135deg, #0A5C6A 0%, #12B5A5 100%);
+		box-shadow: 0 8rpx 20rpx rgba(10, 92, 106, 0.18);
 	}
 
 	.sync-btn-text {
@@ -294,11 +320,11 @@
 	}
 
 	.ghost-text {
-		color: #8D7964;
+		color: var(--app-primary);
 	}
 
 	.primary-text {
-		color: #FFFDF8;
+		color: #FFFFFF;
 	}
 
 	.bottom-space {

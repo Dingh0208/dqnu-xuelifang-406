@@ -21,6 +21,13 @@
 			<!-- 三分类筛选常驻：全部 / 已完成 / 未完成（默认全部；只改展示，不改任务状态） -->
 			<task-filter-tabs :current="currentFilter" @change="switchFilter" />
 
+			<!-- 无任务时的产品化引导：不是空文案，而是下一步行动 -->
+			<view v-if="statTotal === 0" class="empty-plan-card">
+				<text class="empty-plan-title">今天还没有计划</text>
+				<text class="empty-plan-sub">用 30 秒给自己安排几件小事，比盲目开始更有效。</text>
+				<view class="empty-plan-btn" @click="goPlan"><text>去制定今日计划</text></view>
+			</view>
+
 			<view class="task-card">
 				<task-list
 					:tasks="tasks"
@@ -128,6 +135,10 @@
 			switchFilter(key) {
 				this.currentFilter = key
 				this.refresh()
+			},
+			// 无任务 → 去工作台制定计划
+			goPlan() {
+				uni.navigateTo({ url: '/pages/workbench/index' })
 			}
 		}
 	}
@@ -136,54 +147,52 @@
 <style>
 	.page {
 		min-height: 100vh;
-		background-color: #F7EFE3;
-		padding: 10rpx 24rpx 0;
+		padding: 10rpx 32rpx 0;
 		box-sizing: border-box;
 	}
 
 	.page-title {
 		display: block;
-		font-size: 40rpx;
+		padding: 24rpx 8rpx 18rpx;
+		font-size: 38rpx;
 		font-weight: 600;
-		color: #4A3520;
-		padding: 28rpx 8rpx 20rpx;
+		color: var(--app-ink, #0D2F36);
 	}
 
-	/* 顶部完成度行（沿用页面配色：#8D7964 标签 + #4A3520 数字） */
 	.progress-line {
 		display: flex;
 		align-items: baseline;
-		padding: 0 8rpx 4rpx;
+		padding: 0 8rpx 10rpx;
 	}
 
 	.progress-label {
-		font-size: 26rpx;
-		color: #8D7964;
-		margin-right: 16rpx;
+		margin-right: 14rpx;
+		font-size: 24rpx;
+		color: var(--app-muted, #7B9AA1);
 	}
 
 	.progress-num {
-		font-size: 36rpx;
-		font-weight: 600;
-		color: #4A3520;
+		font-size: 34rpx;
+		font-weight: 700;
+		color: var(--app-primary, #0A5C6A);
+		font-variant-numeric: tabular-nums;
 	}
 
-	/* 任务卡片容器（沿用首页卡片视觉：#FFFDF8 底 + 24rpx 圆角 + 同款阴影） */
 	.task-card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 12rpx 30rpx 24rpx;
+		padding: 10rpx 28rpx 22rpx;
 		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		background: var(--app-surface, rgba(255, 255, 255, 0.90));
+		border: 1rpx solid var(--app-line, #D3E8E7);
+		border-radius: 28rpx;
+		box-shadow: var(--app-shadow-soft, 0 4rpx 14rpx rgba(10, 80, 90, 0.06));
 	}
 
-	/* loading / error 状态提示（沿用页面现有配色） */
 	.state-tip {
 		padding: 120rpx 0 40rpx;
 		text-align: center;
-		font-size: 26rpx;
-		color: #8D7964;
-		line-height: 1.6;
+		font-size: 25rpx;
+		line-height: 1.7;
+		color: var(--app-muted, #7B9AA1);
 	}
 
 	.state-text {
@@ -192,13 +201,59 @@
 
 	.state-retry {
 		display: inline-block;
+		height: 64rpx;
+		line-height: 64rpx;
 		margin-top: 24rpx;
-		padding: 10rpx 40rpx;
+		padding: 0 36rpx;
 		border-radius: 999rpx;
-		border: 1rpx solid #E0C9A6;
-		background-color: #FFF9EE;
-		color: #4A3520;
-		font-size: 26rpx;
+		border: 1rpx solid var(--app-line, #D3E8E7);
+		background: var(--app-surface-solid, #FFFFFF);
+		color: var(--app-primary, #0A5C6A);
+		font-size: 25rpx;
+	}
+
+	.empty-plan-card {
+		margin: 8rpx 0 24rpx;
+		padding: 34rpx 30rpx;
+		background: var(--app-surface-solid, #FFFFFF);
+		border: 1rpx solid var(--app-line, #D3E8E7);
+		border-radius: 28rpx;
+		box-shadow: var(--app-shadow-soft, 0 4rpx 14rpx rgba(10, 80, 90, 0.06));
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	.empty-plan-title {
+		font-size: 29rpx;
+		font-weight: 600;
+		color: var(--app-ink, #0D2F36);
+	}
+
+	.empty-plan-sub {
+		margin-top: 10rpx;
+		font-size: 23rpx;
+		line-height: 1.6;
+		color: var(--app-muted, #7B9AA1);
+	}
+
+	.empty-plan-btn {
+		margin-top: 22rpx;
+		height: 72rpx;
+		padding: 0 34rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: linear-gradient(135deg, #0A5C6A 0%, #12B5A5 100%);
+		border-radius: 999rpx;
+		box-shadow: 0 6rpx 16rpx rgba(10, 92, 106, 0.16);
+	}
+
+	.empty-plan-btn text {
+		font-size: 25rpx;
+		font-weight: 600;
+		color: #FFFFFF;
 	}
 
 	.bottom-space {

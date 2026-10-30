@@ -148,38 +148,53 @@ var wrongQuestions = [
 ]
 
 // ---------- 上传历史记录 ----------
+// 每个批次带 questionIds + questions 摘要，历史页可以直接展示“这批识别出了哪些题”。
 var uploadHistories = [
 	{
 		id: 'h_001',
-		fileName: '高数随堂错题.jpg',
+		fileName: '高数期中错题.jpg',
 		source: 'camera',
-		uploadTime: '2026-09-02 19:15',
+		uploadTime: '2026-08-29 10:24',
 		status: 'success',
-		resultCount: 1
+		resultCount: 1,
+		questionIds: [3001],
+		questions: [
+			{ id: 3001, title: '极限的定义与基本性质', subject: '高等数学', status: 'review' }
+		]
 	},
 	{
 		id: 'h_002',
 		fileName: '数据结构错题集.pdf',
 		source: 'document',
-		uploadTime: '2026-09-01 08:30',
+		uploadTime: '2026-08-31 16:08',
 		status: 'success',
-		resultCount: 2
+		resultCount: 1,
+		questionIds: [3002],
+		questions: [
+			{ id: 3002, title: '链表插入与删除', subject: '数据结构', status: 'review' }
+		]
 	},
 	{
 		id: 'h_003',
 		fileName: '英语真题错题.docx',
 		source: 'document',
-		uploadTime: '2026-08-31 10:00',
+		uploadTime: '2026-09-02 19:15',
 		status: 'failed',
-		resultCount: 0
+		resultCount: 0,
+		questionIds: [],
+		questions: []
 	},
 	{
 		id: 'h_004',
-		fileName: '高数期中错题.jpg',
-		source: 'camera',
-		uploadTime: '2026-08-29 10:24',
+		fileName: '高数练习错题.docx',
+		source: 'document',
+		uploadTime: '2026-09-01 08:30',
 		status: 'success',
-		resultCount: 1
+		resultCount: 1,
+		questionIds: [3004],
+		questions: [
+			{ id: 3004, title: '复合函数求导法则', subject: '高等数学', status: 'review' }
+		]
 	}
 ]
 
@@ -234,8 +249,41 @@ export function fetchWrongBookDetail(id) {
 }
 
 // POST /api/student/wrongbook/upload/image（拍照上传，返回上传任务）
+// Mock 阶段直接把「待识别」错题插入列表，保证上传后列表/统计可见，而不是返回不存在的 ID。
+var mockQuestionSeq = 4000
+function appendMockQuestion(source) {
+	mockQuestionSeq += 1
+	var now = new Date()
+	var pad = function (n) { return n < 10 ? '0' + n : '' + n }
+	var stamp = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes())
+	var question = {
+		id: mockQuestionSeq,
+		imageUrl: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&h=340&fit=crop',
+		subject: '待识别',
+		title: source === 'document' ? '新导入错题' : '新拍照错题',
+		knowledgePoint: '待识别',
+		knowledgePointId: null,
+		questionType: 'choice',
+		uploadedAt: stamp,
+		source: source,
+		sourceFileId: 'mock_' + source + '_' + mockQuestionSeq,
+		status: 'review',
+		needReview: true,
+		aiStatus: 'processing',
+		aiRecognizedText: '正在识别题目内容…',
+		aiAnalysis: '识别完成后会在这里显示 AI 解析。',
+		wrongCount: 1,
+		reviewLevel: 1,
+		createdAt: stamp + ':00',
+		updatedAt: stamp + ':00'
+	}
+	wrongQuestions.unshift(question)
+	return question.id
+}
+
 export function uploadImageMock(/* filePath */) {
 	var uploadId = 'up_cam_' + Date.now()
+	var questionId = appendMockQuestion('camera')
 	return ok({
 		uploadId: uploadId,
 		source: 'camera',
@@ -246,13 +294,14 @@ export function uploadImageMock(/* filePath */) {
 		progress: 0,
 		createdAt: new Date().toISOString(),
 		// 模拟识别完成后的错题 ID 列表（前端可据此刷新列表）
-		wrongQuestionIds: [3007]
+		wrongQuestionIds: [questionId]
 	})
 }
 
 // POST /api/student/wrongbook/upload/document（文档导入）
 export function uploadDocumentMock(/* filePath */) {
 	var uploadId = 'up_doc_' + Date.now()
+	var questionId = appendMockQuestion('document')
 	return ok({
 		uploadId: uploadId,
 		source: 'document',
@@ -262,7 +311,7 @@ export function uploadDocumentMock(/* filePath */) {
 		status: 'processing',
 		progress: 0,
 		createdAt: new Date().toISOString(),
-		wrongQuestionIds: [3008, 3009]
+		wrongQuestionIds: [questionId]
 	})
 }
 

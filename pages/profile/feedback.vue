@@ -109,32 +109,33 @@
 <style>
 	.page {
 		min-height: 100vh;
-		background-color: #F7EFE3;
-		padding: 10rpx 24rpx 0;
+		padding: 0 var(--app-page-padding);
 		box-sizing: border-box;
+		background: transparent;
 	}
 
 	.page-title {
 		display: block;
-		font-size: 40rpx;
+		font-size: 38rpx;
 		font-weight: 600;
-		color: #4A3520;
-		padding: 28rpx 8rpx 26rpx;
+		color: var(--app-ink);
+		padding: 22rpx 0 22rpx;
 	}
 
 	.section-card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 28rpx 30rpx;
-		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		background-color: var(--app-surface-solid);
+		border: 1rpx solid var(--app-line);
+		border-radius: var(--app-radius);
+		padding: 28rpx;
+		margin-bottom: 22rpx;
+		box-shadow: var(--app-shadow-soft);
 	}
 
 	.section-title {
 		display: block;
-		font-size: 28rpx;
+		font-size: 30rpx;
 		font-weight: 600;
-		color: #4A3520;
+		color: var(--app-ink);
 		margin-bottom: 18rpx;
 	}
 
@@ -144,35 +145,36 @@
 	}
 
 	.type-tag {
-		padding: 14rpx 28rpx;
-		margin: 0 16rpx 16rpx 0;
-		font-size: 25rpx;
-		color: #8D7964;
-		background-color: #F7EFE3;
-		border: 1rpx solid #EFE3D0;
+		padding: 12rpx 26rpx;
+		margin: 0 14rpx 14rpx 0;
+		font-size: 24rpx;
+		color: #0A6B63;
+		background: rgba(18, 181, 165, 0.08);
+		border: 1rpx solid rgba(18, 181, 165, 0.20);
 		border-radius: 999rpx;
 	}
 
 	.type-tag.active {
-		color: #FFFDF8;
-		background-color: #B56A3C;
-		border-color: #B56A3C;
+		color: #FFFFFF;
+		background: linear-gradient(135deg, #0A5C6A 0%, #12B5A5 100%);
+		border-color: transparent;
 	}
 
 	.content-input {
 		width: 100%;
 		min-height: 220rpx;
-		background-color: #F7EFE3;
-		border-radius: 16rpx;
+		background: #FFFFFF;
+		border: 1rpx solid var(--app-line);
+		border-radius: 20rpx;
 		padding: 22rpx;
 		box-sizing: border-box;
 		font-size: 27rpx;
-		color: #4A3520;
+		color: var(--app-ink);
 		line-height: 1.6;
 	}
 
 	.placeholder {
-		color: #B49D82;
+		color: var(--app-hint);
 		font-size: 26rpx;
 	}
 
@@ -181,25 +183,29 @@
 		text-align: right;
 		margin-top: 10rpx;
 		font-size: 22rpx;
-		color: #B49D82;
+		color: var(--app-hint);
 	}
 
 	.contact-input {
 		width: 100%;
-		height: 84rpx;
-		background-color: #F7EFE3;
-		border-radius: 16rpx;
+		height: 88rpx;
+		background: #FFFFFF;
+		border: 1rpx solid var(--app-line);
+		border-radius: 20rpx;
 		padding: 0 22rpx;
 		box-sizing: border-box;
 		font-size: 27rpx;
-		color: #4A3520;
+		color: var(--app-ink);
 	}
 
 	.submit-btn {
-		background-color: #B56A3C;
-		border-radius: 24rpx;
-		padding: 26rpx 0;
-		text-align: center;
+		height: 88rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: linear-gradient(135deg, #0A5C6A 0%, #12B5A5 100%);
+		border-radius: 999rpx;
+		box-shadow: 0 8rpx 20rpx rgba(10, 92, 106, 0.18);
 	}
 
 	.submit-btn.disabled {
@@ -207,9 +213,9 @@
 	}
 
 	.submit-text {
-		font-size: 29rpx;
+		font-size: 28rpx;
 		font-weight: 600;
-		color: #FFFDF8;
+		color: #FFFFFF;
 	}
 
 	.bottom-space {

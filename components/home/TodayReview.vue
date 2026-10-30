@@ -1,8 +1,8 @@
 <template>
 	<view class="card">
 		<view class="card-header">
-			<text class="card-title">今天该复习什么</text>
-			<text v-if="showMore" class="card-more" @click="onMore">查看全部 ›</text>
+			<text class="card-title">今日复习提醒</text>
+			<text v-if="showMore" class="card-more" @click="onMore">根据记录 · 共 {{ reviews.length }} 项</text>
 		</view>
 
 		<view
@@ -11,8 +11,14 @@
 			class="review-row"
 			:class="{ 'last-row': index === reviews.length - 1 }"
 		>
-			<text class="review-title">{{ item.title }}</text>
-			<text class="review-sub">上次学习：{{ item.lastStudyDaysAgo }}天前</text>
+			<view class="review-main">
+				<text class="review-title">{{ item.title }}</text>
+				<text class="review-sub">上次学习：{{ item.lastStudyDaysAgo }}天前</text>
+			</view>
+		</view>
+
+		<view v-if="reviews.length === 0" class="review-empty">
+			<text>今天没有需要复习的内容</text>
 		</view>
 	</view>
 </template>
@@ -42,11 +48,12 @@
 
 <style>
 	.card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 32rpx 30rpx;
+		padding: 28rpx;
 		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		background: var(--app-surface, rgba(255, 255, 255, 0.90));
+		border: 1rpx solid var(--app-line, #D3E8E7);
+		border-radius: 28rpx;
+		box-shadow: var(--app-shadow-soft, 0 4rpx 14rpx rgba(10, 80, 90, 0.06));
 	}
 
 	.card-header {
@@ -59,35 +66,57 @@
 	.card-title {
 		font-size: 32rpx;
 		font-weight: 600;
-		color: #4A3520;
+		color: var(--app-ink, #0D2F36);
 	}
 
 	.card-more {
-		font-size: 26rpx;
-		color: #8D7964;
+		font-size: 24rpx;
+		color: var(--app-muted, #7B9AA1);
 	}
 
 	.review-row {
-		padding: 26rpx 0;
-		border-bottom: 1rpx solid #EFE3D0;
+		display: flex;
+		align-items: center;
+		padding: 22rpx 0;
+		border-bottom: 1rpx solid var(--app-line, #D3E8E7);
 	}
 
 	.review-row.last-row {
 		border-bottom: none;
-		padding-bottom: 8rpx;
+		padding-bottom: 4rpx;
+	}
+
+	.review-main {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.review-title {
 		display: block;
-		font-size: 30rpx;
-		color: #4A3520;
+		font-size: 29rpx;
 		font-weight: 500;
+		line-height: 42rpx;
+		color: var(--app-ink, #0D2F36);
 	}
 
 	.review-sub {
 		display: block;
-		font-size: 24rpx;
-		color: #8D7964;
-		margin-top: 8rpx;
+		margin-top: 6rpx;
+		font-size: 23rpx;
+		line-height: 1.5;
+		color: var(--app-muted, #7B9AA1);
+	}
+
+	.review-empty {
+		padding: 36rpx 0 20rpx;
+		text-align: center;
+	}
+
+	.review-empty text {
+		font-size: 25rpx;
+		line-height: 1.6;
+		color: var(--app-muted, #7B9AA1);
 	}
 </style>

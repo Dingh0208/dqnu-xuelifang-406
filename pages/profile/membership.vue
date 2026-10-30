@@ -3,11 +3,14 @@
 		<!-- 会员卡：高级但克制，颜色与金币完全不同 -->
 		<view class="member-card">
 			<view class="card-head">
-				<text class="icon">👑</text>
+				<view class="member-icon"><text class="member-icon-text">会</text></view>
 				<text class="title">终身会员</text>
 			</view>
 			<view v-if="pageStatus === 'loading'" class="state-skeleton"></view>
-			<text v-else-if="pageStatus === 'error'" class="state error" @click="loadData">会员状态加载失败</text>
+			<view v-else-if="pageStatus === 'error'" class="state-error">
+				<text class="state error">会员状态加载失败</text>
+				<view class="mini-btn" @click="loadData"><text class="mini-btn-text">重新加载</text></view>
+			</view>
 			<text v-else-if="isMember" class="state">已开通 · 已享有长期会员权益</text>
 			<text v-else class="state">未开通 · 一次购买，长期享受学习权益</text>
 		</view>
@@ -73,17 +76,19 @@
 <style>
 	.page {
 		min-height: 100vh;
-		background-color: #F7EFE3;
-		padding: 10rpx 24rpx 0;
+		padding: 20rpx var(--app-page-padding) 0;
 		box-sizing: border-box;
+		background: transparent;
 	}
 
 	.member-card {
-		background: linear-gradient(135deg, #FBF4E8 0%, #F3E6D0 100%);
-		border-radius: 24rpx;
-		padding: 40rpx 30rpx;
+		position: relative;
+		overflow: hidden;
+		border-radius: 36rpx;
+		padding: 38rpx 32rpx;
 		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(140, 90, 60, 0.08);
+		background: linear-gradient(135deg, #0B4F5B 0%, #0E7480 48%, #17AAA1 100%);
+		box-shadow: 0 16rpx 36rpx rgba(10, 80, 90, 0.18);
 	}
 
 	.card-head {
@@ -91,51 +96,82 @@
 		align-items: center;
 	}
 
-	.icon {
-		font-size: 48rpx;
-		line-height: 1;
+	.member-icon {
+		width: 56rpx;
+		height: 56rpx;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.20);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.member-icon-text {
+		font-size: 26rpx;
+		font-weight: 600;
+		color: #FFFFFF;
 	}
 
 	.title {
 		margin-left: 16rpx;
 		font-size: 36rpx;
-		font-weight: 700;
-		color: #6A4A28;
+		font-weight: 600;
+		color: #FFFFFF;
 	}
 
 	.state {
 		display: block;
 		margin-top: 20rpx;
 		font-size: 26rpx;
-		color: #8D7964;
+		color: rgba(255, 255, 255, 0.86);
 	}
 
 	.state.error {
-		color: #B56A3C;
+		margin-top: 0;
+		color: rgba(255, 255, 255, 0.92);
+	}
+
+	.state-error {
+		margin-top: 20rpx;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.mini-btn {
+		padding: 10rpx 24rpx;
+		border-radius: 999rpx;
+		background: rgba(255, 255, 255, 0.18);
+	}
+
+	.mini-btn-text {
+		font-size: 23rpx;
+		color: #FFFFFF;
 	}
 
 	.state-skeleton {
 		margin-top: 20rpx;
 		width: 280rpx;
-		height: 32rpx;
+		height: 30rpx;
 		border-radius: 8rpx;
-		background-color: #EFE3D0;
+		background: rgba(255, 255, 255, 0.18);
 	}
 
 	.section-card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 28rpx 30rpx;
+		background-color: var(--app-surface-solid);
+		border: 1rpx solid var(--app-line);
+		border-radius: var(--app-radius);
+		padding: 28rpx;
 		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		box-shadow: var(--app-shadow-soft);
 	}
 
 	.section-title {
 		display: block;
-		font-size: 28rpx;
+		font-size: 30rpx;
 		font-weight: 600;
-		color: #4A3520;
-		margin-bottom: 16rpx;
+		color: var(--app-ink);
+		margin-bottom: 14rpx;
 	}
 
 	.bullet {
@@ -146,7 +182,7 @@
 
 	.bullet-dot {
 		font-size: 30rpx;
-		color: #B56A3C;
+		color: var(--app-accent);
 		margin-right: 14rpx;
 		line-height: 1.4;
 	}
@@ -154,13 +190,13 @@
 	.bullet-text {
 		flex: 1;
 		font-size: 26rpx;
-		color: #4A3520;
+		color: var(--app-copy);
 		line-height: 1.6;
 	}
 
 	.note-text {
 		font-size: 25rpx;
-		color: #8D7964;
+		color: var(--app-muted);
 		line-height: 1.6;
 	}
 

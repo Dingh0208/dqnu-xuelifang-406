@@ -48,6 +48,27 @@ export function getSilverProducts() {
 	return request({ url: '/api/student/mall/silver/products', method: 'GET' })
 }
 
+// 4b. 金币兑换商品（学习金币的用途出口）
+export function getCoinProducts() {
+	if (USE_MOCK) return Promise.resolve(mock.fetchCoinProducts())
+	return request({ url: '/api/student/mall/coin/products', method: 'GET' })
+}
+
+// 4c. 金币兑换权益（余额不足时后端返回业务错误）
+export function redeemCoinProduct(productId) {
+	if (USE_MOCK) {
+		return Promise.resolve(mock.redeemCoinProduct(productId)).then(function (res) {
+			if (!res || res.code !== 200) throw res || new Error('兑换失败')
+			return res
+		})
+	}
+	return request({
+		url: '/api/student/mall/coin/redeem',
+		method: 'POST',
+		data: { productId: productId }
+	})
+}
+
 // 5. 创建银币充值订单（当前 Mock 不发起微信/支付宝支付；真实支付逻辑暂不实现）
 export function createSilverOrder(productId) {
 	if (USE_MOCK) return Promise.resolve(mock.createSilverOrder(productId))

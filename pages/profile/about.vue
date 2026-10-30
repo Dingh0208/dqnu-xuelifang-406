@@ -60,73 +60,76 @@
 <style>
 	.page {
 		min-height: 100vh;
-		background-color: #F7EFE3;
-		padding: 10rpx 24rpx 0;
+		padding: 0 var(--app-page-padding);
 		box-sizing: border-box;
+		background: transparent;
 	}
 
 	.page-title {
 		display: block;
-		font-size: 40rpx;
+		font-size: 38rpx;
 		font-weight: 600;
-		color: #4A3520;
-		padding: 28rpx 8rpx 26rpx;
+		color: var(--app-ink);
+		padding: 22rpx 0 22rpx;
 	}
 
 	.brand-card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 48rpx 30rpx;
+		background-color: var(--app-surface-solid);
+		border: 1rpx solid var(--app-line);
+		border-radius: var(--app-radius);
+		padding: 48rpx 28rpx;
 		margin-bottom: 24rpx;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		box-shadow: var(--app-shadow-soft);
 	}
 
 	.logo {
 		width: 120rpx;
 		height: 120rpx;
 		border-radius: 28rpx;
-		background: linear-gradient(135deg, #EEB048 0%, #E8A340 100%);
+		background: linear-gradient(135deg, #0A5C6A 0%, #12B5A5 100%);
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		box-shadow: 0 10rpx 24rpx rgba(10, 92, 106, 0.18);
 	}
 
 	.logo-text {
-		font-size: 56rpx;
-		font-weight: 700;
-		color: #FFFDF8;
+		font-size: 54rpx;
+		font-weight: 600;
+		color: #FFFFFF;
 	}
 
 	.brand-name {
 		margin-top: 22rpx;
 		font-size: 34rpx;
 		font-weight: 600;
-		color: #4A3520;
+		color: var(--app-ink);
 	}
 
 	.brand-version {
 		margin-top: 10rpx;
 		font-size: 24rpx;
-		color: #8D7964;
+		color: var(--app-muted);
 	}
 
 	.list-card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 0 30rpx;
+		background-color: var(--app-surface-solid);
+		border: 1rpx solid var(--app-line);
+		border-radius: var(--app-radius);
+		padding: 0 28rpx;
 		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		box-shadow: var(--app-shadow-soft);
 	}
 
 	.row {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 28rpx 0;
-		border-bottom: 1rpx solid #EFE3D0;
+		padding: 26rpx 0;
+		border-bottom: 1rpx solid var(--app-line);
 	}
 
 	.row.last-row {
@@ -135,18 +138,18 @@
 
 	.row-label {
 		font-size: 27rpx;
-		color: #8D7964;
+		color: var(--app-muted);
 	}
 
 	.row-value {
 		font-size: 27rpx;
-		font-weight: 600;
-		color: #4A3520;
+		font-weight: 500;
+		color: var(--app-ink);
 	}
 
 	.row-arrow {
 		font-size: 34rpx;
-		color: #C6B092;
+		color: var(--app-hint);
 	}
 
 	.bottom-space {

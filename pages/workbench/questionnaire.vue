@@ -37,16 +37,17 @@
 <style>
 	.page {
 		min-height: 100vh;
-		background-color: #F7EFE3;
-		padding: 40rpx 24rpx 24rpx;
+		padding: 24rpx var(--app-page-padding);
 		box-sizing: border-box;
+		background: transparent;
 	}
 
 	.notice-card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 60rpx 30rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		background-color: var(--app-surface-solid);
+		border: 1rpx solid var(--app-line);
+		border-radius: var(--app-radius);
+		padding: 56rpx 28rpx;
+		box-shadow: var(--app-shadow-soft);
 		text-align: center;
 	}
 
@@ -54,41 +55,45 @@
 		display: block;
 		font-size: 32rpx;
 		font-weight: 600;
-		color: #4A3520;
+		color: var(--app-ink);
 	}
 
 	.notice-mode {
 		display: block;
-		margin-top: 36rpx;
-		font-size: 26rpx;
-		color: #8D7964;
+		margin-top: 32rpx;
+		font-size: 25rpx;
+		color: var(--app-muted);
 	}
 
 	.notice-mode-value {
-		display: block;
-		margin-top: 10rpx;
-		font-size: 30rpx;
+		display: inline-block;
+		margin-top: 14rpx;
+		padding: 10rpx 24rpx;
+		border-radius: 999rpx;
+		background: rgba(18, 181, 165, 0.10);
+		color: #0A6B63;
+		font-size: 27rpx;
 		font-weight: 600;
-		color: #B56A3C;
 	}
 
 	.back-btn {
-		margin-top: 56rpx;
-		align-self: center;
+		margin-top: 48rpx;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 22rpx 64rpx;
-		background-color: #B56A3C;
+		height: 88rpx;
+		padding: 0 56rpx;
+		background: linear-gradient(135deg, #0A5C6A 0%, #12B5A5 100%);
 		border-radius: 999rpx;
+		box-shadow: 0 8rpx 20rpx rgba(10, 92, 106, 0.18);
 		margin-left: auto;
 		margin-right: auto;
-		width: fit-content;
+		width: 360rpx;
 	}
 
 	.back-btn-text {
-		font-size: 30rpx;
+		font-size: 28rpx;
 		font-weight: 600;
-		color: #FFFDF8;
+		color: #FFFFFF;
 	}
 </style>

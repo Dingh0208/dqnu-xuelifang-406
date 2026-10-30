@@ -47,7 +47,12 @@ export function getTodayTasks() {
 
 // 4. 修改任务完成状态（当前 Checkbox 只改本地状态；后端接入后此方法即真实 PATCH）
 export function updateTaskCompleted(taskId, completed) {
-	if (USE_MOCK) return Promise.resolve(mock.patchTask(taskId, completed))
+	if (USE_MOCK) {
+		return Promise.resolve(mock.patchTask(taskId, completed)).then(function (res) {
+			if (!res || res.code !== 200) throw res || new Error('任务状态更新失败')
+			return res
+		})
+	}
 	return request({
 		url: '/api/student/home/today/tasks/' + taskId,
 		method: 'PATCH',

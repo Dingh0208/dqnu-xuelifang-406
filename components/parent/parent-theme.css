@@ -1,0 +1,226 @@
+/* 海盐薄荷 · 家长端共享主题
+ * 只在 pages/parent/** 中通过 @import 引入。
+ * 与 App.vue 的 --app-* / --parent-* token 对齐，并为页面内组件提供统一布局与状态样式。
+ */
+page {
+	/* ---------- 海盐薄荷基础 token ---------- */
+	--app-bg: #EDF8F7;
+	--app-surface-solid: #FFFFFF;
+	--app-surface: rgba(255, 255, 255, 0.90);
+	--app-surface-soft: #E2F3F2;
+	--app-ink: #0D2F36;
+	--app-copy: #44666E;
+	--app-muted: #7B9AA1;
+	--app-hint: #A9C2C6;
+	--app-line: #D3E8E7;
+	--app-primary: #0A5C6A;
+	--app-primary-dark: #083F4A;
+	--app-accent: #12B5A5;
+	--app-accent-soft: #8FE3D8;
+	--app-sky: #38BDF8;
+	--app-positive: #0E9F86;
+	--app-positive-bg: #E2F7F1;
+	--app-warning: #C48A2A;
+	--app-warning-bg: #FFF5E2;
+	--app-negative: #D56157;
+	--app-negative-bg: #FCECEA;
+	--app-shadow: 0 10rpx 28rpx rgba(10, 80, 90, 0.10);
+	--app-shadow-soft: 0 4rpx 14rpx rgba(10, 80, 90, 0.06);
+
+	/* ---------- 家长端兼容 token（与 App.vue 中的旧名对齐） ---------- */
+	--parent-bg: var(--app-bg);
+	--parent-surface: var(--app-surface);
+	--parent-surface-solid: var(--app-surface-solid);
+	--parent-surface-soft: var(--app-surface-soft);
+	--parent-ink: var(--app-ink);
+	--parent-copy: var(--app-copy);
+	--parent-muted: var(--app-muted);
+	--parent-hint: var(--app-hint);
+	--parent-line: var(--app-line);
+	--parent-track: #D9EEEC;
+	--parent-positive: var(--app-positive);
+	--parent-positive-bg: var(--app-positive-bg);
+	--parent-negative: var(--app-negative);
+	--parent-negative-bg: var(--app-negative-bg);
+	--parent-dark: var(--app-primary-dark);
+	--parent-dark-copy: rgba(255, 255, 255, 0.72);
+	--parent-mint: var(--app-accent-soft);
+	--parent-white: #FFFFFF;
+	--parent-card-radius: 28rpx;
+	--parent-page-padding: 32rpx;
+
+	background-color: #EDF8F7;
+	background-image:
+		radial-gradient(circle at 12% 0%, rgba(56, 189, 248, 0.18), transparent 52%),
+		radial-gradient(circle at 88% 4%, rgba(18, 181, 165, 0.16), transparent 46%),
+		linear-gradient(180deg, #EDF8F7 0%, #F8FCFB 100%);
+	background-repeat: no-repeat;
+	background-size: cover;
+	color: var(--app-ink);
+	font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "HarmonyOS Sans SC", "Helvetica Neue", sans-serif;
+}
+
+.parent-page {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background: transparent;
+}
+
+.parent-scroll {
+	flex: 1;
+	height: 0;
+	min-height: 0;
+}
+
+.parent-content {
+	padding: 0 var(--app-page-padding, 32rpx);
+	box-sizing: border-box;
+}
+
+.parent-heading {
+	padding: 14rpx 4rpx 18rpx;
+}
+
+.parent-title {
+	display: block;
+	color: var(--app-ink);
+	font-size: 38rpx;
+	line-height: 52rpx;
+	font-weight: 600;
+	letter-spacing: 0;
+}
+
+.parent-subtitle {
+	display: block;
+	margin-top: 6rpx;
+	color: var(--app-muted);
+	font-size: 24rpx;
+	line-height: 36rpx;
+}
+
+.aq-card {
+	background: var(--app-surface-solid);
+	border: 1rpx solid var(--app-line);
+	border-radius: var(--app-radius, 28rpx);
+	box-shadow: var(--app-shadow-soft);
+	box-sizing: border-box;
+}
+
+.aq-card-soft {
+	background: var(--app-surface-soft);
+	border: 1rpx solid var(--app-line);
+	border-radius: var(--app-radius, 28rpx);
+	box-sizing: border-box;
+}
+
+.aq-hero {
+	position: relative;
+	overflow: hidden;
+	border-radius: var(--app-radius-lg, 36rpx);
+	background: linear-gradient(135deg, #0B4F5B 0%, #0E7480 48%, #17AAA1 100%);
+	box-shadow: var(--app-shadow);
+	color: #FFFFFF;
+	box-sizing: border-box;
+}
+
+.aq-btn {
+	position: relative;
+	overflow: hidden;
+	height: 88rpx;
+	padding: 0 32rpx;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	border-radius: 999rpx;
+	font-size: 28rpx;
+	font-weight: 600;
+	line-height: 1;
+}
+
+.aq-btn-primary {
+	background: linear-gradient(135deg, #0A5C6A, #12B5A5);
+	border-top: 1rpx solid rgba(255, 255, 255, 0.22);
+	box-shadow: 0 8rpx 20rpx rgba(10, 92, 106, 0.18);
+	color: #FFFFFF;
+}
+
+.aq-btn-secondary {
+	background: var(--app-surface-solid);
+	border: 1rpx solid var(--app-line);
+	color: var(--app-primary);
+}
+
+.aq-btn-ghost {
+	background: rgba(255, 255, 255, 0.16);
+	border: 1rpx solid rgba(255, 255, 255, 0.34);
+	color: #FFFFFF;
+}
+
+.aq-chip {
+	display: inline-flex;
+	align-items: center;
+	padding: 8rpx 18rpx;
+	border-radius: 999rpx;
+	background: rgba(18, 181, 165, 0.10);
+	color: #0A6B63;
+	font-size: 22rpx;
+	font-weight: 500;
+	line-height: 1.4;
+}
+
+.aq-tap {
+	opacity: 0.82;
+}
+
+.parent-state {
+	margin-top: 24rpx;
+	padding: 60rpx 32rpx;
+	box-sizing: border-box;
+	border: 1rpx dashed var(--app-line);
+	border-radius: var(--app-radius, 28rpx);
+	background: var(--app-surface);
+	text-align: center;
+}
+
+.parent-state-title {
+	display: block;
+	color: var(--app-ink);
+	font-size: 28rpx;
+	font-weight: 600;
+	line-height: 40rpx;
+}
+
+.parent-state-desc {
+	display: block;
+	margin-top: 8rpx;
+	color: var(--app-muted);
+	font-size: 24rpx;
+	line-height: 36rpx;
+}
+
+.parent-state-action {
+	margin-top: 24rpx;
+}
+
+.aq-spinner {
+	width: 40rpx;
+	height: 40rpx;
+	margin: 0 auto 18rpx;
+	border: 4rpx solid rgba(18, 181, 165, 0.18);
+	border-top-color: var(--app-accent);
+	border-radius: 50%;
+	animation: aq-spin 0.8s linear infinite;
+}
+
+@keyframes aq-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.bottom-space {
+	height: 28rpx;
+}

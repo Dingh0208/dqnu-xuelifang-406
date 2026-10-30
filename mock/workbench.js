@@ -16,7 +16,7 @@
 var inspirations = [
 	{
 		id: 'rpg',
-		icon: '🎮',
+		icon: '冒',
 		title: 'RPG 冒险工作台',
 		description: '把目标、任务和成长变成一场冒险'
 		// TODO 未来字段（当前不使用，仅占位）：
@@ -28,43 +28,43 @@ var inspirations = [
 	},
 	{
 		id: 'pet',
-		icon: '🐾',
+		icon: '伴',
 		title: 'AI 宠物陪伴工作台',
 		description: '让 AI 宠物陪伴你的学习与生活'
 	},
 	{
 		id: 'grow',
-		icon: '🌱',
+		icon: '长',
 		title: '成长养成工作台',
 		description: '用成长、等级和阶段记录自己的进步'
 	},
 	{
 		id: 'space',
-		icon: '🚀',
+		icon: '宇',
 		title: '太空探索工作台',
 		description: '把长期目标变成一场持续推进的星际探索'
 	},
 	{
 		id: 'campus',
-		icon: '🏫',
+		icon: '校',
 		title: '校园生活工作台',
 		description: '管理学习、作业和校园日常生活'
 	},
 	{
 		id: 'study',
-		icon: '📚',
+		icon: '读',
 		title: '沉浸式学习工作台',
 		description: '专注学习、复习、任务和知识积累'
 	},
 	{
 		id: 'life',
-		icon: '🏢',
+		icon: '营',
 		title: '人生经营工作台',
 		description: '像经营一个长期项目一样管理自己的生活'
 	},
 	{
 		id: 'efficiency',
-		icon: '⏱️',
+		icon: '效',
 		title: '效率管理工作台',
 		description: '统一管理时间、任务、习惯和目标'
 	}
@@ -74,7 +74,7 @@ var inspirations = [
 var createModes = [
 	{
 		id: 'quick',
-		icon: '⚡',
+		icon: '快',
 		title: '快速创建',
 		questionCount: 20,
 		summary: '用最少的时间告诉 AI，你大概想要什么。',
@@ -82,7 +82,7 @@ var createModes = [
 	},
 	{
 		id: 'deep',
-		icon: '🧠',
+		icon: '深',
 		title: '深度创建',
 		questionCount: 50,
 		summary: '更全面地定制你的工作台，适合已经有明确想法的用户。',
@@ -90,7 +90,7 @@ var createModes = [
 	},
 	{
 		id: 'custom',
-		icon: '🎨',
+		icon: '极',
 		title: '极致定制',
 		questionCount: 100,
 		summary: '从视觉、功能、AI角色到交互方式，尽可能控制工作台的每一个细节。',
@@ -123,14 +123,43 @@ export function fetchInspirationDetail(id) {
 	}
 }
 
-// 3. 创建工作台（提交自由描述；当前不真正生成，仅返回成功占位）
+// 3. 创建工作台：提交自由描述后，Mock 从关键词派生 2-4 条今日任务返回，
+//    前端可一键「加入今日计划」，让 AI 工作台真正有结果出口。
+function deriveTasks(description) {
+	var text = (description || '').toLowerCase()
+	var seeds = [
+		{ title: '专注学习 25 分钟', description: '选一个最难的任务，先专注 25 分钟', estimatedMinutes: 25, keywords: ['专注', '番茄', '计时', '学习'] },
+		{ title: '复习今日错题', description: '把今天新录入的错题重新做一遍', estimatedMinutes: 20, keywords: ['错题', '复习', '重做'] },
+		{ title: '背诵英语单词', description: '记忆 30 个高频词汇并自测', estimatedMinutes: 20, keywords: ['单词', '英语', '背诵', '词汇'] },
+		{ title: '阅读一篇短文', description: '完成一篇阅读并总结三句话', estimatedMinutes: 30, keywords: ['阅读', '文章', '读书'] },
+		{ title: '整理明日计划', description: '列出明天最重要的三件事', estimatedMinutes: 10, keywords: ['计划', '安排', '整理'] },
+		{ title: '运动拉伸 15 分钟', description: '起身活动，放松肩颈', estimatedMinutes: 15, keywords: ['运动', '拉伸', '锻炼', '健康'] }
+	]
+	var picked = seeds.filter(function (s) {
+		return s.keywords.some(function (k) { return text.indexOf(k) !== -1 })
+	})
+	// 没命中关键词时给一个默认的「每日三件事」起点
+	if (!picked.length) picked = [seeds[0], seeds[4]]
+	return picked.slice(0, 3).map(function (s, i) {
+		return {
+			id: 'ai_' + Date.now() + '_' + i,
+			title: s.title,
+			description: s.description,
+			estimatedMinutes: s.estimatedMinutes,
+			source: 'ai',
+			completed: false
+		}
+	})
+}
+
 export function createWorkbench(payload) {
 	return {
 		code: 0,
 		msg: 'ok',
 		data: {
 			workbenchId: 'wb_' + Date.now(),
-			status: 'pending'
+			status: 'generated',
+			tasks: deriveTasks(payload && payload.description)
 		}
 	}
 }

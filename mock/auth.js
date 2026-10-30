@@ -49,6 +49,17 @@ export function mockLogin(params) {
 	})
 }
 
+// 按 userId（即 account）查询用户完整信息（预置 + 注册），供成员列表等场景复用
+// 返回：{ account, password, role, nickname } 或 null
+export function getMockUserById(userId) {
+	if (!userId) return null
+	var all = users.concat(getRegistered())
+	for (var i = 0; i < all.length; i++) {
+		if (all[i].account === userId) return all[i]
+	}
+	return null
+}
+
 export function mockRegister(params) {
 	return new Promise(function (resolve) {
 		setTimeout(function () {
@@ -59,9 +70,20 @@ export function mockRegister(params) {
 					return
 				}
 			}
+			// 教师身份必须由学校/管理员通过邀请关系开通，禁止自助注册直接获得教师权限。
+			if (params.role === 'teacher') {
+				resolve({ code: 403, msg: '教师账号需由学校管理员开通，请使用教师入口登录已有账号' })
+				return
+			}
+			if (params.role !== 'student' && params.role !== 'parent') {
+				resolve({ code: 400, msg: '不支持的注册身份' })
+				return
+			}
 			var user = { account: params.account, password: params.password, role: params.role, nickname: params.nickname || params.account }
 			saveRegistered(getRegistered().concat([user]))
-			resolve({ code: 0, msg: 'ok', data: { account: user.account, role: user.role, nickname: user.nickname } })
+			// 注册成功即自动登录，返回体与登录成功保持同一认证结构（含 token），
+			// saveLoginUser 会同步写入统一 student_token
+			resolve({ code: 0, msg: 'ok', data: { account: user.account, role: user.role, nickname: user.nickname, token: 'mock-token-' + user.account } })
 		}, 300)
 	})
 }

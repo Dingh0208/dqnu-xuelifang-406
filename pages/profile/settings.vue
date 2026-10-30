@@ -43,7 +43,7 @@
 				uni.showModal({
 					title: '退出登录',
 					content: '确定要退出当前账号吗？',
-					confirmColor: '#E8A340',
+					confirmColor: '#0A5C6A',
 					success: (res) => {
 						if (!res.confirm) return
 						authApi.logout()
@@ -59,33 +59,34 @@
 <style>
 	.page {
 		min-height: 100vh;
-		background-color: #F7EFE3;
-		padding: 10rpx 24rpx 0;
+		padding: 0 var(--app-page-padding);
 		box-sizing: border-box;
+		background: transparent;
 	}
 
 	.page-title {
 		display: block;
-		font-size: 40rpx;
+		font-size: 38rpx;
 		font-weight: 600;
-		color: #4A3520;
-		padding: 28rpx 8rpx 26rpx;
+		color: var(--app-ink);
+		padding: 22rpx 0 22rpx;
 	}
 
 	.list-card {
-		background-color: #FFFDF8;
-		border-radius: 24rpx;
-		padding: 0 30rpx;
-		margin-bottom: 24rpx;
-		box-shadow: 0 4rpx 14rpx rgba(181, 106, 60, 0.06);
+		background-color: var(--app-surface-solid);
+		border: 1rpx solid var(--app-line);
+		border-radius: var(--app-radius);
+		padding: 0 28rpx;
+		margin-bottom: 22rpx;
+		box-shadow: var(--app-shadow-soft);
 	}
 
 	.row {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 28rpx 0;
-		border-bottom: 1rpx solid #EFE3D0;
+		padding: 26rpx 0;
+		border-bottom: 1rpx solid var(--app-line);
 	}
 
 	.row.last-row {
@@ -93,17 +94,17 @@
 	}
 
 	.row-label {
-		font-size: 29rpx;
-		color: #4A3520;
+		font-size: 28rpx;
+		color: var(--app-ink);
 	}
 
 	.row-arrow {
 		font-size: 34rpx;
-		color: #C6B092;
+		color: var(--app-hint);
 	}
 
 	.logout-label {
-		color: #C0563C;
+		color: var(--app-negative);
 	}
 
 	.bottom-space {
