@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // P4.5 导航断链修复 + 班级中心 回归
 // 覆盖：resolveAssignTargetClass 单/多/无管理班决策；fetchManagedClasses 仅返回 ACTIVE ADMIN 班级（多班级支持）；
 //       getClassMembers.isMember 字段（纯 ADMIN=false → 拦截进学生详情；ADMIN+MEMBER=true → 放行）；
@@ -49,7 +49,7 @@ function loadModule(relPath, deps) {
 	return fn(uni, ...keys.map(function (k) { return deps[k] }))
 }
 
-var config = loadModule('utils/config.js', {})
+var config = { USE_MOCK: true, API_BASE_URL: '' } // 契约测试固定跑 Mock 分支
 var request = loadModule('api/request.js', { '@/utils/config.js': config })
 var mockAuth = loadModule('mock/auth.js', {})
 var auth = loadModule('api/auth.js', {

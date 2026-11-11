@@ -26,11 +26,25 @@
 import { USE_MOCK } from '@/utils/config.js'
 import { request } from './request.js'
 import * as mock from '@/mock/home.js'
+import { setTaskStateContext } from '@/utils/taskState.js'
+
+// 任务状态是「单一事实来源」，但数据源随环境切换：
+//   Mock 模式 → mock/home.js 模块加载时已用种子数据初始化；
+//   真实后端 → 必须用服务端返回的 tasks 重建，否则首页会停留在 Mock 种子任务上。
+// 这里统一在拿到响应后同步一次（setTaskStateContext 会保留当天本地完成态顺序）。
+function syncTaskState(res) {
+	try {
+		if (res && res.data && Array.isArray(res.data.tasks)) {
+			setTaskStateContext(res.data.tasks)
+		}
+	} catch (e) {}
+	return res
+}
 
 // 1. 首页聚合数据
 export function getHomeToday() {
-	if (USE_MOCK) return Promise.resolve(mock.fetchHomeToday())
-	return request({ url: '/api/student/home/today', method: 'GET' })
+	if (USE_MOCK) return Promise.resolve(mock.fetchHomeToday()).then(syncTaskState)
+	return request({ url: '/api/student/home/today', method: 'GET' }).then(syncTaskState)
 }
 
 // 2. 每日欢迎
@@ -41,8 +55,8 @@ export function getWelcome() {
 
 // 3. 今日任务列表
 export function getTodayTasks() {
-	if (USE_MOCK) return Promise.resolve(mock.fetchTasks())
-	return request({ url: '/api/student/home/today/tasks', method: 'GET' })
+	if (USE_MOCK) return Promise.resolve(mock.fetchTasks()).then(syncTaskState)
+	return request({ url: '/api/student/home/today/tasks', method: 'GET' }).then(syncTaskState)
 }
 
 // 4. 修改任务完成状态（当前 Checkbox 只改本地状态；后端接入后此方法即真实 PATCH）

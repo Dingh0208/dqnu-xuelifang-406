@@ -2,7 +2,9 @@
 
 学立方是一款面向 **学生 / 教师 / 家长** 三端的学习管理微信小程序，基于 **uni-app + Vue 3** 构建。它把「今日任务、错题复习、班级教学、家长周报」放进同一条数据链路：学生完成任务 → 教师查看真实完成进度 → 家长看懂孩子这一周。
 
-> 当前阶段数据层全部使用本地 Mock（`USE_MOCK = true`），后端为未来 Spring Boot 接入口。
+> 本版本已接入真实后端（`USE_MOCK = false`）：数据全部来自 **Node + Express + MySQL** 的
+> `xlf-backend` 服务，接口路径与 `api/*.js` 中预留的契约一致。切回纯 Mock 只需把
+> `utils/config.js` 的 `USE_MOCK` 改回 `true`。
 
 ---
 
@@ -61,6 +63,18 @@ student-app/
 
 ## 🚀 快速开始
 
+### 前置：启动后端
+
+小程序的数据全部来自 `xlf-backend`（Node + Express + MySQL，含后台管理台）：
+
+```bat
+cd xlf-backend
+start.cmd          :: 拉起便携版 MySQL(3307) + 后端(3100)，并打开管理台 /admin/
+```
+
+后端地址配置在 `utils/config.js` 的 `API_BASE_URL`（默认 `http://127.0.0.1:3100`）。
+真机调试改成电脑局域网 IP；微信开发者工具需勾「详情 → 本地设置 → 不校验合法域名」。
+
 ### 方式一：微信小程序（推荐）
 
 1. 用 **HBuilderX** 打开本目录 `student-app`
@@ -70,7 +84,7 @@ student-app/
 ### 方式二：H5 预览
 
 ```bash
-# 需要 Node 24+
+# 需要 Node 24+（uni-app H5 编译器来自本机 HBuilderX 安装目录）
 cd _h5_runner          # 构建工具目录（与本项目并列）
 npm ci --ignore-scripts
 
@@ -80,15 +94,17 @@ node ../_h5_runner/serve.js ../_h5_dist_v4 5192
 # 打开 http://127.0.0.1:5192/#/pages/auth/select
 ```
 
+> 后端已开启 CORS，H5（5192）可直接跨端口访问 3100 的接口。
 > `_h5_runner` / `_h5_src` 仅用于本地 H5 视觉验收，不属于 `student-app` 源码；日常开发以 HBuilderX 为主。
 
 ### 演示账号
 
-| 身份 | 账号 | 密码 |
-| --- | --- | --- |
-| 学生 | `student01` | `123456` |
-| 教师 | `teacher01` | `123456` |
-| 家长 | `parent01` | `123456` |
+| 身份 | 账号 | 密码 | 说明 |
+| --- | --- | --- | --- |
+| 学生 | `student01` ~ `student05` | `123456` | 高一（3）班成员 |
+| 教师 | `teacher01` / `teacher02` | `123456` | 班级 ADMIN |
+| 家长 | `parent01` | `123456` | 绑定 2 个孩子 |
+| 管理员 | `admin` | `admin123` | 仅用于后台管理台 `/admin/` |
 
 ---
 
@@ -122,7 +138,8 @@ node test-ws.js
 
 ## 🔄 Git 工作流
 
-- 主分支：`main`
-- 功能分支：`dev-student` / `dev-teacher` / `dev-parent` / `dev-auth` / `dev-admin`
+- 主分支：`main`（= 全 Mock 版本基线，tag `v1.0-mock`）
+- 当前分支：`feat/real-backend`（接入真实后端版本，tag `v2.0-backend`）
+- 两版可用 `git diff v1.0-mock v2.0-backend` 对比，`git checkout v1.0-mock` 可一键回到 Mock 版
 - 提交前请运行对应测试套件，确保全部通过
-- 不提交 `unpackage/`（已在 `.gitignore` 中忽略）
+- 不提交 `unpackage/`、`.hbuilderx/`（已在 `.gitignore` 中忽略）

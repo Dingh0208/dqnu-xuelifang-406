@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // P3-WS 工作空间切换 E2E（Node 纯数据层，不依赖小程序运行时）
 // 覆盖：ADMIN 预检 / 越权拦截 / 双身份 / 创建班级后放行 / 学生空间切换 / 退出后拦截
 // 运行：node test-ws.js
@@ -47,7 +47,7 @@ function loadModule(relPath, deps) {
 	return fn(uni, ...keys.map(function (k) { return deps[k] }))
 }
 
-var config = loadModule('utils/config.js', {})
+var config = { USE_MOCK: true, API_BASE_URL: '' } // 契约测试固定跑 Mock 分支
 var request = loadModule('api/request.js', { '@/utils/config.js': config })
 var mockAuth = loadModule('mock/auth.js', {})
 var auth = loadModule('api/auth.js', {

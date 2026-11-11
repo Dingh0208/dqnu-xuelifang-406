@@ -151,7 +151,8 @@ mockAuth.mockLogin({ account: 'teacher01', password: '123456' }).then(function (
 		equal(appLaunches[0], '/pages/auth/select', '未登录教师路由回身份选择页')
 
 		console.log('Case 5：教师页面路由与模块入口完整')
-		var pageConfig = JSON.parse(fs.readFileSync(path.join(ROOT, 'pages.json'), 'utf8'))
+		var pageJson = fs.readFileSync(path.join(ROOT, 'pages.json'), 'utf8').replace(/\/\/[^\n\r]*/g, '') // HBuilderX 会写入带注释的 condition 配置，先去掉行注释再解析
+		var pageConfig = JSON.parse(pageJson)
 		var teacherPages = pageConfig.pages.filter(function (page) { return page.path.indexOf('pages/teacher/') === 0 })
 		check(teacherPages.length >= 14, '教师首页及业务页面均已注册')
 		check(teacherPages.every(function (page) { return fs.existsSync(path.join(ROOT, page.path + '.vue')) }), '每条教师路由都有页面文件')

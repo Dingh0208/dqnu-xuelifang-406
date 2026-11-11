@@ -86,9 +86,9 @@ var tasks = [
 	}
 ]
 
-// 注册到共享任务状态（Bug-1 单一来源：此后 tasks 即共享数组本身，patch 真正写回；
-// 当天 storage 状态在此一次性恢复，跨天残留直接忽略）
-initTaskState(tasks)
+// 任务状态不再在模块加载时注册：Mock 与真实后端共用同一套「单一事实来源」，
+// 由 api/home.js 拿到响应后统一 setTaskStateContext(服务端/种子任务) 重建。
+// 这样接入后端时不会先被 Mock 种子任务占位，导致首页显示 Mock 标题。
 
 // 固定教师 Mock 任务也遵循 StudentTask 受众，不能仅因设备共享而对所有学生可见。
 createStudentTasksForTask({ id: 't-3001', classId: 'class-001' }, getActiveMemberUserIds('class-001'))

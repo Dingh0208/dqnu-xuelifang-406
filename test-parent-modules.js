@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 
 const root = __dirname
-const routes = JSON.parse(fs.readFileSync(path.join(root, 'pages.json'), 'utf8')).pages.map(item => item.path)
+const routes = JSON.parse(fs.readFileSync(path.join(root, 'pages.json'), 'utf8').replace(/\/\/[^\n\r]*/g, '')).pages.map(item => item.path)
 ;['home', 'report', 'children', 'profile'].forEach(page => {
 	const route = 'pages/parent/' + page
 	assert(routes.includes(route), 'missing route: ' + route)

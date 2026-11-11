@@ -1,5 +1,5 @@
-// 统一请求封装（未来 Spring Boot 后端接入时使用）
-// 当前 USE_MOCK = true，业务层（api/home.js）不会走到这里，因此不会发送任何真实请求。
+// 统一请求封装（真实后端：xlf-backend / Express + MySQL）
+// USE_MOCK = false（utils/config.js）时，业务层（api/home.js 等）全部走这里发真实请求。
 // 页面/组件禁止直接调用 uni.request，一律通过 api/ 层间接使用本入口。
 //
 // 认证链路（学生 / 教师 / 家长共用，禁止第二套 token 存储）：
@@ -7,8 +7,10 @@
 //   业务请求 → 本文件 getToken() 读取 student_token 并注入 Authorization: Bearer <token>
 //   401      → handleUnauthorized() 清登录态并 reLaunch 到身份选择页（本文件为单点入口）
 
-// 后端基础地址：未来部署时填写，例如 'https://api.example.com'
-const BASE_URL = ''
+import { API_BASE_URL } from '@/utils/config.js'
+
+// 后端基础地址：集中配置在 utils/config.js，部署换环境只改一处
+const BASE_URL = API_BASE_URL
 
 // 全项目唯一实际请求 Token 的 Storage Key（api/auth.js 复用本文件 setToken/getToken）
 const TOKEN_KEY = 'student_token'
