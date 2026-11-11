@@ -1,0 +1,14 @@
+{
+  "libVersion": "3.17.6",
+  "projectname": "dqnu-xuelifang-406-dev-student",
+  "setting": {
+    "urlCheck": true,
+    "coverView": true,
+    "lazyloadPlaceholderEnable": false,
+    "skylineRenderEnable": false,
+    "preloadBackgroundData": false,
+    "autoAudits": false,
+    "showShadowRootInWxmlPanel": true,
+    "compileHotReLoad": true
+  }
+}

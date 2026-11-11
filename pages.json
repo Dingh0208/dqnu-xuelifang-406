@@ -1,0 +1,308 @@
+{
+	"pages": [
+		{
+			"path": "pages/auth/select",
+			"style": {
+				"navigationBarTitleText": "学立方"
+			}
+		},
+		{
+			"path": "pages/auth/login",
+			"style": {
+				"navigationBarTitleText": "登录 / 注册"
+			}
+		},
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "学生端首页"
+			}
+		},
+		{
+			"path": "pages/teacher/home",
+			"style": {
+				"navigationBarTitleText": "老师主页",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/parent/home",
+			"style": {
+				"navigationBarTitleText": "成长陪伴",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/parent/report",
+			"style": {
+				"navigationBarTitleText": "学习周报",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/parent/children",
+			"style": {
+				"navigationBarTitleText": "孩子与成长",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/parent/profile",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/wrongbook/index",
+			"style": {
+				"navigationBarTitleText": "错题本"
+			}
+		},
+		{
+			"path": "pages/wrongbook/detail",
+			"style": {
+				"navigationBarTitleText": "错题详情"
+			}
+		},
+		{
+			"path": "pages/wrongbook/history",
+			"style": {
+				"navigationBarTitleText": "历史记录"
+			}
+		},
+		{
+			"path": "pages/workbench/index",
+			"style": {
+				"navigationBarTitleText": "工作台"
+			}
+		},
+		{
+			"path": "pages/workbench/assistant",
+			"style": {
+				"navigationBarTitleText": "小筑 AI",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/workbench/inspiration-detail",
+			"style": {
+				"navigationBarTitleText": "工作台灵感"
+			}
+		},
+		{
+			"path": "pages/workbench/create-mode",
+			"style": {
+				"navigationBarTitleText": "创建工作台"
+			}
+		},
+		{
+			"path": "pages/workbench/questionnaire",
+			"style": {
+				"navigationBarTitleText": "工作台创建"
+			}
+		},
+		{
+			"path": "pages/profile/index",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/schedule/index",
+			"style": {
+				"navigationBarTitleText": "学习安排"
+			}
+		},
+		{
+			"path": "pages/tasks/index",
+			"style": {
+				"navigationBarTitleText": "今日计划"
+			}
+		},
+		{
+			"path": "pages/review/index",
+			"style": {
+				"navigationBarTitleText": "复习安排"
+			}
+		},
+		{
+			"path": "pages/shop/index",
+			"style": {
+				"navigationBarTitleText": "银币商城"
+			}
+		},
+		{
+			"path": "pages/profile/coin-detail",
+			"style": {
+				"navigationBarTitleText": "学习金币"
+			}
+		},
+		{
+			"path": "pages/profile/membership",
+			"style": {
+				"navigationBarTitleText": "终身会员"
+			}
+		},
+		{
+			"path": "pages/profile/faq",
+			"style": {
+				"navigationBarTitleText": "常见问题"
+			}
+		},
+		{
+			"path": "pages/profile/feedback",
+			"style": {
+				"navigationBarTitleText": "向开发者提建议"
+			}
+		},
+		{
+			"path": "pages/profile/settings",
+			"style": {
+				"navigationBarTitleText": "设置"
+			}
+		},
+		{
+			"path": "pages/profile/theme",
+			"style": {
+				"navigationBarTitleText": "主题"
+			}
+		},
+		{
+			"path": "pages/profile/about",
+			"style": {
+				"navigationBarTitleText": "关于学立方"
+			}
+		},
+		{
+			"path": "pages/class/index",
+			"style": {
+				"navigationBarTitleText": "我的班级"
+			}
+		},
+		{
+			"path": "pages/class/detail",
+			"style": {
+				"navigationBarTitleText": "班级详情"
+			}
+		},
+		{
+			"path": "pages/class/join",
+			"style": {
+				"navigationBarTitleText": "加入班级"
+			}
+		},
+		{
+			"path": "pages/teacher/class/create",
+			"style": {
+				"navigationBarTitleText": "创建班级",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/class/index",
+			"style": {
+				"navigationBarTitleText": "班级中心",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/class/detail",
+			"style": {
+				"navigationBarTitleText": "班级详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/class/members",
+			"style": {
+				"navigationBarTitleText": "班级成员",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/task/index",
+			"style": {
+				"navigationBarTitleText": "任务管理",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/task/create",
+			"style": {
+				"navigationBarTitleText": "创建任务",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/task/detail",
+			"style": {
+				"navigationBarTitleText": "任务详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/task/progress",
+			"style": {
+				"navigationBarTitleText": "完成进度",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/teaching/index",
+			"style": {
+				"navigationBarTitleText": "作业",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/student/detail",
+			"style": {
+				"navigationBarTitleText": "学生详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/class/analytics",
+			"style": {
+				"navigationBarTitleText": "班级学习数据",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/profile/index",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/teacher/module/index",
+			"style": {
+				"navigationBarTitleText": "教师工具",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "学立方",
+		"navigationBarBackgroundColor": "#EDF8F7",
+		"backgroundColor": "#EDF8F7"
+	},
+	"uniIdRouter": {},
+	"condition" : { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [
+			{
+				"name": "", //模式名称
+				"path": "", //启动页面，必选
+				"query": "" //启动参数，在页面的onLoad函数里面得到
+			}
+		]
+	}
+}
