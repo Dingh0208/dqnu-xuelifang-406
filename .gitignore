@@ -157,8 +157,9 @@ node_modules/
 .vscode/
 Thumbs.db
 # ---------- 后端 server/ ----------
-# 便携版 MySQL 运行时（1GB+，含 data 数据目录）：不进版本库
-server/mysql/
+# 数据库使用本机 MySQL 服务（MySQL80 / 3306），不再内置便携实例
+# 若本地临时启用便携版 MySQL，可放开下一行避免误提交
+# server/mysql/
 # 依赖与运行产物
 server/node_modules/
 server/shots/

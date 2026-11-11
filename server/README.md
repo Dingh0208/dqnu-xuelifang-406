@@ -4,10 +4,10 @@
 自带一个中文后台管理网页（登录、概览、18 张业务表的增删改查、金币手动调整）。
 
 > 本目录是前端工程的一部分（`student-app/server/`），与小程序共用同一个 git 仓库。
-> `mysql/`（便携 MySQL 运行时 + data 数据目录）和 `node_modules/` 已 gitignore，不进版本库。
+> 数据库使用本机安装的 MySQL 8.0.28 服务 **MySQL80**（端口 3306，开机自启），`node_modules/` 不进版本库。
 
 - 后端：Node.js 24 + Express 4 + mysql2 + JWT + bcrypt
-- 数据库：MySQL 8.0.28（便携版，存放在 `mysql/`，端口 **3307**，不进系统服务）
+- 数据库：MySQL 8.0.28（本机服务 **MySQL80**，端口 **3306**，数据目录 `C:\ProgramData\MySQL\MySQL Server 8.0\Data`）
 - 管理台：纯静态 SPA（`public/`），由后端同端口托管
 
 ```
@@ -34,10 +34,9 @@ server/
 │   ├── verify-h5.mjs      小程序 H5 端「真连后端」端到端验证
 │   ├── h5-fixture.cjs     验证用标记数据（改标题/昵称，直改 MySQL）
 │   └── shot.mjs           无头 Chrome 截图
-├── mysql/                 便携版 MySQL（my.ini / data，已 gitignore，不进版本库）
 ├── .env                   端口、数据库账号、JWT 密钥（已 gitignore）
 ├── .env.example           配置模板
-├── start.cmd              一键启动（MySQL + 后端 + 打开管理台）
+├── start.cmd              一键启动（检查 MySQL 服务 + 后端 + 打开管理台）
 └── shots/                 管理台截图
 ```
 
@@ -47,22 +46,25 @@ server/
 
 ### 一键（推荐）
 
-双击 `start.cmd`：检测 `3307` 端口 → 未运行则拉起便携版 MySQL → 启动后端 → 打开
+双击 `start.cmd`：检测 `3306` → 未运行则 `net start MySQL80` → 启动后端 → 打开
 <http://127.0.0.1:3100/admin/>。
 
 ### 手动
 
 ```bat
-:: 1. MySQL（便携版，仅首次需要 initialize，data/ 已初始化好）
-mysql\mysql-8.0.28-winx64\bin\mysqld.exe --defaults-file=mysql\my.ini
+:: 1. 启动数据库服务（管理员命令行；服务为开机自启，通常无需手动）
+net start MySQL80
 
-:: 2. 建库建表（首次或改表结构后）
+:: 2. 建库建表（首次或换机器时；会用到 .env 里的 root 账号）
 node scripts\init-db.js
 node scripts\seed.js
 
 :: 3. 后端
 node src\server.js
 ```
+
+> 换机器/重装系统后：先装 MySQL 8（本机为 8.0.28），再用 root 执行
+> `node scripts/init-db.js` 建库与应用账号 `xlf`，最后 `node scripts/seed.js` 灌演示数据。
 
 | 地址 | 说明 |
 | --- | --- |

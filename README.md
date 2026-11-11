@@ -58,7 +58,7 @@ student-app/
 │   ├── public/     #   后台管理台静态页
 │   ├── sql/        #   建表脚本 + 种子数据
 │   ├── scripts/    #   自检 / 截图 / 验证脚本
-│   └── mysql/      #   便携版 MySQL 运行时（gitignore，不进版本库）
+│   └── .env.example #   数据库与 JWT 配置模板（真实 .env 不入库）
 ├── App.vue         # 全局样式 + 路由守卫
 ├── main.js         # 入口 + 全局登录守卫 mixin
 ├── pages.json      # 页面注册与全局样式
@@ -71,12 +71,16 @@ student-app/
 
 ### 前置：启动后端
 
-小程序的数据全部来自同目录下的 `server/`（Node + Express + MySQL，含后台管理台）：
+小程序的数据全部来自同目录下的 `server/`（Node + Express + MySQL，含后台管理台）。
+数据库是本机安装的 MySQL 8.0.28 服务 `MySQL80`（端口 3306，开机自启）：
 
 ```bat
 cd server
-start.cmd          :: 拉起便携版 MySQL(3307) + 后端(3100)，并打开管理台 /admin/
+start.cmd          :: 检查 MySQL80 服务(3306) + 启动后端(3100)，并打开管理台 /admin/
 ```
+
+> 换机器时：装好 MySQL 8 → 执行 `node server/scripts/init-db.js` 建库建账号 →
+> `node server/scripts/seed.js` 灌演示数据 → 按需改 `server/.env`。
 
 后端地址配置在 `utils/config.js` 的 `API_BASE_URL`（默认 `http://127.0.0.1:3100`）。
 真机调试改成电脑局域网 IP；微信开发者工具需勾「详情 → 本地设置 → 不校验合法域名」。
