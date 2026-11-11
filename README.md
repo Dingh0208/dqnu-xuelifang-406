@@ -3,7 +3,7 @@
 学立方是一款面向 **学生 / 教师 / 家长** 三端的学习管理微信小程序，基于 **uni-app + Vue 3** 构建。它把「今日任务、错题复习、班级教学、家长周报」放进同一条数据链路：学生完成任务 → 教师查看真实完成进度 → 家长看懂孩子这一周。
 
 > 本版本已接入真实后端（`USE_MOCK = false`）：数据全部来自 **Node + Express + MySQL** 的
-> `xlf-backend` 服务，接口路径与 `api/*.js` 中预留的契约一致。切回纯 Mock 只需把
+> 同目录 `server/` 服务，接口路径与 `api/*.js` 中预留的契约一致。切回纯 Mock 只需把
 > `utils/config.js` 的 `USE_MOCK` 改回 `true`。
 
 ---
@@ -48,11 +48,17 @@
 ```
 student-app/
 ├── api/            # 接口封装（USE_MOCK 切换 mock / request）
-├── mock/           # 本地 Mock 数据
+├── mock/           # 本地 Mock 数据（USE_MOCK=false 时不参与）
 ├── utils/          # 业务工具：任务状态、金币、主题、工作区等
 ├── components/     # 公共组件（home / my / teacher / parent / wrongbook / common）
 ├── pages/          # 页面（auth / index / tasks / wrongbook / workbench / profile / class / shop / teacher / parent）
 ├── static/         # 静态资源
+├── server/         # 后端（Node + Express + MySQL + 后台管理台）
+│   ├── src/        #   接口实现（auth / student / teacher / parent / admin）
+│   ├── public/     #   后台管理台静态页
+│   ├── sql/        #   建表脚本 + 种子数据
+│   ├── scripts/    #   自检 / 截图 / 验证脚本
+│   └── mysql/      #   便携版 MySQL 运行时（gitignore，不进版本库）
 ├── App.vue         # 全局样式 + 路由守卫
 ├── main.js         # 入口 + 全局登录守卫 mixin
 ├── pages.json      # 页面注册与全局样式
@@ -65,10 +71,10 @@ student-app/
 
 ### 前置：启动后端
 
-小程序的数据全部来自 `xlf-backend`（Node + Express + MySQL，含后台管理台）：
+小程序的数据全部来自同目录下的 `server/`（Node + Express + MySQL，含后台管理台）：
 
 ```bat
-cd xlf-backend
+cd server
 start.cmd          :: 拉起便携版 MySQL(3307) + 后端(3100)，并打开管理台 /admin/
 ```
 

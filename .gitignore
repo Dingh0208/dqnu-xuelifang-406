@@ -156,3 +156,11 @@ node_modules/
 .idea/
 .vscode/
 Thumbs.db
+# ---------- 后端 server/ ----------
+# 便携版 MySQL 运行时（1GB+，含 data 数据目录）：不进版本库
+server/mysql/
+# 依赖与运行产物
+server/node_modules/
+server/shots/
+server/*.log
+server/*.pid

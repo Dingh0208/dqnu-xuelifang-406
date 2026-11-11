@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>学立方 · 后台管理台</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <!-- 登录 -->
+  <div id="login-view" class="login-wrap hidden">
+    <div class="login-card">
+      <div class="brand">
+        <div class="brand-logo">学</div>
+        <div>
+          <h1>学立方 · 管理台</h1>
+          <p>学生 / 教师 / 家长三端数据统一运营后台</p>
+        </div>
+      </div>
+      <form id="login-form" class="login-form">
+        <label>管理员账号 <input id="login-account" value="admin" autocomplete="username" required /></label>
+        <label>密码 <input id="login-password" type="password" value="admin123" autocomplete="current-password" required /></label>
+        <button class="btn btn-primary btn-block" type="submit">登 录</button>
+        <div id="login-error" class="login-error"></div>
+      </form>
+      <div class="login-tip">默认账号 <code>admin</code> / <code>admin123</code>，数据来自 MySQL <code>xuelifang</code> 库</div>
+    </div>
+  </div>
+
+  <!-- 主体 -->
+  <div id="app-view" class="app hidden">
+    <aside class="sidebar">
+      <div class="side-brand"><span class="brand-logo sm">学</span><span>学立方后台</span></div>
+      <nav id="side-nav" class="side-nav"></nav>
+      <div class="side-foot">
+        <div class="db-badge" id="db-badge">MySQL · 连接中…</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 id="page-title">概览</h2>
+          <p id="page-sub" class="page-sub">平台整体运行情况</p>
+        </div>
+        <div class="topbar-right">
+          <button id="btn-refresh" class="btn btn-ghost" title="刷新">刷新</button>
+          <span class="admin-chip"><b id="admin-name">admin</b> · 管理员</span>
+          <button id="btn-logout" class="btn btn-ghost">退出</button>
+        </div>
+      </header>
+      <section id="content" class="content"></section>
+    </main>
+  </div>
+
+  <!-- 弹窗 -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="modal-title">编辑</h3>
+        <button class="icon-btn" id="modal-close">×</button>
+      </div>
+      <form id="modal-form" class="modal-form"></form>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="modal-cancel">取消</button>
+        <button class="btn btn-primary" id="modal-save">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="./app.js"></script>
+</body>
+</html>
